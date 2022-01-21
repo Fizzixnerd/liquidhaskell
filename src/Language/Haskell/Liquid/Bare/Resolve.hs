@@ -37,6 +37,7 @@ module Language.Haskell.Liquid.Bare.Resolve
 
   -- * Misc 
   , srcVars
+  , localBinds
   , coSubRReft
 
   -- * Conversions from Bare

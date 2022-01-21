@@ -727,7 +727,7 @@ makeSpecSig cfg name specs env sigEnv tycEnv measEnv cbs = do
     , gsNewTypes = newTys 
     , gsTexprs   = [ (v, t, es) | (v, t, Just es) <- mySigs ] 
     }
-  where 
+  where
     dicts      = Bare.makeSpecDictionaries env sigEnv specs  
     mySpec     = M.lookupDefault mempty name specs
     allSpecs   = M.toList specs 
@@ -782,9 +782,14 @@ makeTySigs env sigEnv name spec = do
     cook x bt = Bare.cookSpecType env sigEnv name (Bare.HsTV x) bt 
 
 bareTySigs :: Bare.Env -> ModName -> Ms.BareSpec -> Bare.Lookup [(Ghc.Var, LocBareType)]
-bareTySigs env name spec = checkDuplicateSigs <$> vts 
-  where 
-    vts = forM ( Ms.sigs spec ++ Ms.localSigs spec ) $ \ (x, t) -> do 
+bareTySigs env name spec = (\vts' -> (checkDuplicateSigs $ ((vts' ++ rest) & L.nubBy (\x y -> fst x == fst y)))) <$> vts
+  where
+    cond = True
+    vars :: [Ghc.Var]
+    vars = (Bare.srcVars $ Bare.reSrc env) & L.filter (isLocInFile (_giTarget $ Bare.reSrc env))
+    types = vars & fmap (\v -> (v, (bareOfType . Ghc.varType <$> GM.locNamedThing v)))
+    rest =  if cond then types else []
+    vts = forM (Ms.sigs spec ++ Ms.localSigs spec) $ \ (x, t) -> do 
             v <- F.notracepp "LOOKUP-GHC-VAR" $ Bare.lookupGhcVar env name "rawTySigs" x
             return (v, t) 
 
@@ -1044,9 +1049,9 @@ makeSpecName env tycEnv measEnv name = SpNames
   , gsDconsP   = [ F.atLoc dc (dcpCon dc) | dc <- datacons ++ cls ] 
   , gsTconsP   = Bare.qualifyTopDummy env name <$> tycons                
   -- , gsLits = mempty                                              -- TODO-REBARE, redundant with gsMeas
-  , gsTcEmbeds = Bare.tcEmbs     tycEnv   
-  , gsADTs     = Bare.tcAdts     tycEnv 
-  , gsTyconEnv = Bare.tcTyConMap tycEnv  
+  , gsTcEmbeds = Bare.tcEmbs     tycEnv
+  , gsADTs     = Bare.tcAdts     tycEnv
+  , gsTyconEnv = Bare.tcTyConMap tycEnv
   }
   where 
     datacons, cls :: [DataConP]

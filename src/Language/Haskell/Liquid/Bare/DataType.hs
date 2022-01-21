@@ -364,7 +364,7 @@ meetDataConSpec allowTC emb xts dcs  = M.toList $ snd <$> L.foldl' upd dcm0 xts
     upd dcm (x, t)           = M.insert x (Ghc.getSrcSpan x, tx') dcm
                                 where
                                   tx' = maybe t (meetX x t) (M.lookup x dcm)
-    meetX x t (sp', t')      = F.notracepp (_msg x t t') $ meetVarTypes emb (pprint x) (Ghc.getSrcSpan x, t) (sp', t') 
+    meetX x t (sp', t')      = meetVarTypes emb (pprint x) (Ghc.getSrcSpan x, t) (sp', t') 
     _msg x t t'              = "MEET-VAR-TYPES: " ++ showpp (x, t, t')
 
 dataConSpec' :: Bool -> [DataConP] -> [(Ghc.Var, (Ghc.SrcSpan, SpecType))]

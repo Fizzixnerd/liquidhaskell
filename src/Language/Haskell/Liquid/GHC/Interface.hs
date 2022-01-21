@@ -485,7 +485,7 @@ loadModule' tm = loadModule tm'
       --     Ghc.execOptions        
       --   void $ Ghc.execStmt
       --     "let {len :: [a] -> Int; len _ = undefined}"
-      --     Ghc.execOptions        
+      --     Ghc.execOptions
 processTargetModule :: Config -> LogicMap -> DepGraph -> SpecEnv -> FilePath -> TypecheckedModule -> Ms.BareSpec
                     -> Ghc TargetInfo
 processTargetModule cfg0 logicMap depGraph specEnv file typechecked bareSpec = do

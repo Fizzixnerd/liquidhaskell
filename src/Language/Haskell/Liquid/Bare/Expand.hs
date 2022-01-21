@@ -481,15 +481,15 @@ exprArg l msg = F.notracepp ("exprArg: " ++ msg) . go
 cookSpecType :: Bare.Env -> Bare.SigEnv -> ModName -> Bare.PlugTV Ghc.Var -> LocBareType 
              -> LocSpecType 
 cookSpecType env sigEnv name x bt
-         = either Ex.throw id (cookSpecTypeE env sigEnv name x bt)
+         = either Ex.throw (F.tracepp "cookSpecType -- after") (cookSpecTypeE env sigEnv name (F.tracepp ("cookSpecType -- x: " <> GM.showPpr (Ghc.varType <$> Bare.plugSrc x)) x) (F.tracepp "cookSpecType -- before" bt))
   where 
     _msg = "cookSpecType: " ++ GM.showPpr (z, Ghc.varType <$> z)
     z    = Bare.plugSrc x 
 
 
 -----------------------------------------------------------------------------------------
-cookSpecTypeE :: Bare.Env -> Bare.SigEnv -> ModName -> Bare.PlugTV Ghc.Var -> LocBareType 
-              -> Bare.Lookup LocSpecType 
+cookSpecTypeE :: Bare.Env -> Bare.SigEnv -> ModName -> Bare.PlugTV Ghc.Var -> LocBareType
+              -> Bare.Lookup LocSpecType
 -----------------------------------------------------------------------------------------
 cookSpecTypeE env sigEnv name@(ModName _ _) x bt
   = id
@@ -499,14 +499,14 @@ cookSpecTypeE env sigEnv name@(ModName _ _) x bt
   . fmap (fmap txExpToBind)      -- What does this function DO
   . fmap (specExpandType rtEnv)                        
   . fmap (fmap (generalizeWith x))
-  . fmap (if doplug || not allowTC then maybePlug allowTC  sigEnv name x else id)
+  . fmap (if doplug || not allowTC then maybePlug allowTC sigEnv name x else id)
   -- we do not qualify/resolve Expr/Pred when typeclass is enabled
   -- since ghci will not be able to recognize fully qualified names
   -- instead, we leave qualification to ghc elaboration
   . fmap (Bare.qualifyTop env name l )
   . bareSpecType       env name 
   . bareExpandType     rtEnv
-  $ bt 
+  $ bt
   where
     allowTC = typeclass (getConfig env)
     -- modT   = mname `S.member` wiredInMods
