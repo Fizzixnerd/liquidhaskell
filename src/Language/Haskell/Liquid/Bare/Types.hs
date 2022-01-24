@@ -158,3 +158,4 @@ failMaybe env name res = case res of
 
 isTargetModName :: Env -> ModName -> Bool 
 isTargetModName env name = name == _giTargetMod (reSrc env) 
+

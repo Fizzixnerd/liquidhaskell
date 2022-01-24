@@ -82,7 +82,6 @@ makeDataConSelector dmMb d i
     dm                       = Mb.fromMaybe M.empty dmMb
     def                      = makeDataConSelector' d i
 
-
 makeDataConSelector' :: Ghc.DataCon -> Int -> F.Symbol
 makeDataConSelector' d i
   = symbolMeasure "$select" (dcSymbol d) (Just i)

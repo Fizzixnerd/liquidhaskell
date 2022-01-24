@@ -7,6 +7,7 @@ module AutoliftedFields000 where
 {-@ type Nat = { v : Int | v >= 0 } @-}
 type Nat = Int
 
+{-@ data T = T { getT :: Nat } @-}
 data T = T { getT :: Nat }
 
 {-@ f :: Int -> Nat @-}

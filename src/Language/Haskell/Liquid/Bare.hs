@@ -117,7 +117,7 @@ makeTargetSpec :: Config
                -> BareSpec
                -> TargetDependencies
                -> Ghc.TcRn (Either Diagnostics ([Warning], TargetSpec, LiftedSpec))
-makeTargetSpec cfg lmap targetSrc bareSpec dependencies = do
+makeTargetSpec cfg lmap targetSrc bareSpec_ dependencies = do
   let depsDiagnostics     = mapM (uncurry Bare.checkBareSpec) legacyDependencies
   let bareSpecDiagnostics = Bare.checkBareSpec (giTargetMod targetSrc) legacyBareSpec
   case depsDiagnostics >> bareSpecDiagnostics of
@@ -175,6 +175,30 @@ makeTargetSpec cfg lmap targetSrc bareSpec dependencies = do
 
     legacyBareSpec :: Spec LocBareType F.LocSymbol
     legacyBareSpec = review bareSpecIso bareSpec
+    
+    bareSpec :: BareSpec
+    bareSpec = MkBareSpec $ (getBareSpec bareSpec_)
+               { sigs = F.tracepp "sigs"
+                        $ uniquify
+                        $ (getThe sigs bareSpec_)
+                          <> (getThe sigs autoliftedSigsSpec) }
+      where
+        getThe f = f . getBareSpec
+        uniquify = L.nubBy (\x y -> let f = (F.val . fst) in f x == f y)
+        env = Bare.makeEnv cfg (review targetSrcIso targetSrc) lmap [(giTargetMod targetSrc, getBareSpec bareSpec_)]
+        autoliftedSigsSpec = makeAutoLiftedSigs env (giTargetMod targetSrc) True (giDefVars targetSrc) (giTarget targetSrc)
+
+makeAutoLiftedSigs :: Bare.Env -> ModName -> Bool -> [Ghc.Var] -> FilePath -> BareSpec
+makeAutoLiftedSigs _env _modName cond vars target =
+  let localUniques = filter (isLocInFile target) vars
+      types = localUniques
+              & fmap (\v ->
+                        let located = GM.locNamedThing v
+                        in (F.tracepp "dummy qualified" . F.symbol <$> located, bareAutoLiftedOfType . Ghc.varType <$> located))
+  in
+    if cond
+    then MkBareSpec $ mempty { sigs = F.tracepp "types" types }
+    else mempty
 
 -------------------------------------------------------------------------------------
 -- | @makeGhcSpec@ invokes @makeGhcSpec0@ to construct the @GhcSpec@ and then
@@ -409,7 +433,10 @@ makeLiftedSpec0 cfg src embs lmap mySpec = mempty
     name         = _giTargetMod src
 
 uniqNub :: (Ghc.Uniquable a) => [a] -> [a]
-uniqNub xs = M.elems $ M.fromList [ (index x, x) | x <- xs ]
+uniqNub = uniqNubWith id
+
+uniqNubWith :: (Ghc.Uniquable b) => (a -> b) -> [a] -> [a]
+uniqNubWith f xs = M.elems $ M.fromList [ (index $ f x, x) | x <- xs ]
   where
     index  = Ghc.getKey . Ghc.getUnique
 
@@ -782,16 +809,13 @@ makeTySigs env sigEnv name spec = do
     cook x bt = Bare.cookSpecType env sigEnv name (Bare.HsTV x) bt 
 
 bareTySigs :: Bare.Env -> ModName -> Ms.BareSpec -> Bare.Lookup [(Ghc.Var, LocBareType)]
-bareTySigs env name spec = (\vts' -> (checkDuplicateSigs $ ((vts' ++ rest) & L.nubBy (\x y -> fst x == fst y)))) <$> vts
+bareTySigs env name spec = checkDuplicateSigs <$> vts
   where
-    cond = True
-    vars :: [Ghc.Var]
-    vars = (Bare.srcVars $ Bare.reSrc env) & L.filter (isLocInFile (_giTarget $ Bare.reSrc env))
-    types = vars & fmap (\v -> (v, (bareOfType . Ghc.varType <$> GM.locNamedThing v)))
-    rest =  if cond then types else []
-    vts = forM (Ms.sigs spec ++ Ms.localSigs spec) $ \ (x, t) -> do 
-            v <- F.notracepp "LOOKUP-GHC-VAR" $ Bare.lookupGhcVar env name "rawTySigs" x
-            return (v, t) 
+    vts = return $ F.tracepp "bareTySigs" $ uniqNubWith fst $ concat $ (flip fmap (Ms.sigs spec ++ Ms.localSigs spec) $ \(x, t) -> do 
+                         let v = F.notracepp "LOOKUP-GHC-VAR" $ Bare.lookupGhcVar env name "rawTySigs" x
+                         case v of
+                           Left _ -> []
+                           Right v' -> [(v', t)])
 
 -- checkDuplicateSigs :: [(Ghc.Var, LocSpecType)] -> [(Ghc.Var, LocSpecType)] 
 checkDuplicateSigs :: (Symbolic x) => [(x, F.Located t)] -> [(x, F.Located t)]

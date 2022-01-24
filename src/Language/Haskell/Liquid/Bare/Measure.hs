@@ -200,20 +200,20 @@ qualifiedDataName mod (DnCon  lx) = DnCon  (qualifyModName mod <$> lx)
 
 {-tyConDataDecl :: {tc:TyCon | isAlgTyCon tc} -> Maybe DataDecl @-}
 tyConDataDecl :: ((Ghc.TyCon, DataName), HasDataDecl) -> Maybe DataDecl
-tyConDataDecl (_, HasDecl)
-  = Nothing 
-tyConDataDecl ((tc, dn), NoDecl szF)
+tyConDataDecl ((tc, dn), hasDecl)
   = Just $ DataDecl
-      { tycName   = dn
+      { tycName = dn
       , tycTyVars = F.symbol <$> GM.tyConTyVarsDef tc
       , tycPVars  = []
       , tycDCons  = Just (decls tc)
       , tycSrcPos = GM.getSourcePos tc
-      , tycSFun   = szF
+      , tycSFun   = case hasDecl of
+                      NoDecl szF -> szF
+                      HasDecl -> Nothing
       , tycPropTy = Nothing
       , tycKind   = DataReflected
       }
-      where decls = map dataConDecl . Ghc.tyConDataCons
+  where decls = map dataConDecl . Ghc.tyConDataCons
 
 tyConDataName :: Bool -> Ghc.TyCon -> Maybe DataName
 tyConDataName full tc

@@ -44,7 +44,7 @@ module Language.Haskell.Liquid.Types.RefType (
   , quantifyFreeRTy
 
   -- * RType constructors
-  , ofType, toType, bareOfType
+  , ofType, toType, bareOfType, bareAutoLiftedOfType
   , bTyVar, rTyVar, rVar, rApp, gApp, rEx
   , symbolRTyVar, bareRTyVar
   , tyConBTyCon
@@ -1378,17 +1378,26 @@ ofType      = ofType_ $ TyConv
 --------------------------------------------------------------------------------
 bareOfType :: Monoid r => Type -> BRType r
 --------------------------------------------------------------------------------
-bareOfType  = ofType_ $ TyConv
+bareOfType  = ofType_ bareOfTypeTyConv
+
+bareOfTypeTyConv :: Monoid r => TyConv BTyCon BTyVar r
+bareOfTypeTyConv = TyConv
   { tcFVar  = (`RVar` mempty) . BTV . symbol
   , tcFTVar = bTVar
   , tcFApp  = \c ts -> bApp c ts [] mempty
   , tcFLit  = ofLitType bApp
   }
 
+bareAutoLiftedOfType :: Monoid r => Type -> BRType r
+bareAutoLiftedOfType = ofTypeNoExpand_ bareOfTypeTyConv
+
 --------------------------------------------------------------------------------
 ofType_ :: Monoid r => TyConv c tv r -> Type -> RType c tv r
 --------------------------------------------------------------------------------
-ofType_ tx = go . expandTypeSynonyms
+ofType_ tx = ofTypeNoExpand_ tx . expandTypeSynonyms
+
+ofTypeNoExpand_ :: Monoid r => TyConv c tv r -> Type -> RType c tv r
+ofTypeNoExpand_ tx = go
   where
     go (TyVarTy α)
       = tcFVar tx α
@@ -1402,7 +1411,7 @@ ofType_ tx = go . expandTypeSynonyms
       | otherwise
       = tcFApp tx c (go <$> τs) -- [] mempty
     go (AppTy t1 t2)
-      = RAppTy (go t1) (ofType_ tx t2) mempty
+      = RAppTy (go t1) (go t2) mempty
     go (LitTy x)
       = tcFLit tx x
     go (CastTy t _)
