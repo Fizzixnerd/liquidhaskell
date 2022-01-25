@@ -175,16 +175,16 @@ makeTargetSpec cfg lmap targetSrc bareSpec_ dependencies = do
 
     legacyBareSpec :: Spec LocBareType F.LocSymbol
     legacyBareSpec = review bareSpecIso bareSpec
-    
+
     bareSpec :: BareSpec
     bareSpec = MkBareSpec $ (getBareSpec bareSpec_)
                { sigs = F.tracepp "sigs"
-
+                        $ uniquify
                         $ (getThe sigs bareSpec_)
                           <> (getThe sigs autoliftedSigsSpec) }
       where
         getThe f = f . getBareSpec
-        _uniquify = uniquifyBy head (\x y -> let f = (F.val . fst) in f x == f y) . L.sortOn (F.val . fst)
+        uniquify = uniquifyBy head (\x y -> let f = (F.val . fst) in f x == f y) . L.sortOn (F.val . fst) . filter (\x -> (not $ F.isPrefixOfSym "lq_anf$" $ F.val $ fst x) && not (not $ F.isPrefixOfSym "ds" $ F.val $ fst x))
         env = Bare.makeEnv cfg (review targetSrcIso targetSrc) lmap [(giTargetMod targetSrc, getBareSpec bareSpec_)]
         autoliftedSigsSpec = makeAutoLiftedSigs env (giTargetMod targetSrc) True (Bare.srcThings $ review targetSrcIso targetSrc) (giTarget targetSrc)
 
@@ -824,14 +824,11 @@ makeTySigs env sigEnv name spec = do
 bareTySigs :: Bare.Env -> ModName -> Ms.BareSpec -> Bare.Lookup [(Ghc.Var, LocBareType)]
 bareTySigs env name spec = checkDuplicateSigs <$> vts
   where
-    vts = return
-          $ F.tracepp "bareTySigs"
-          $ concatMap (\(x, t) -> do
-                          let v = F.notracepp "LOOKUP-GHC-VAR" $ Bare.lookupGhcVar env name "rawTySigs" x
-                          case v of
-                            Left _ -> []
-                            Right v' -> [(v', t)])
-          $ Ms.sigs spec ++ Ms.localSigs spec
+    vts = F.tracepp "bareTySigs"
+          $ traverse (\(x, t) -> do
+                         v <- F.notracepp "LOOKUP-GHC-VAR" $ Bare.lookupGhcVar env name "rawTySigs" x
+                         pure $ (v, t))
+          $ Ms.sigs spec
 
 -- checkDuplicateSigs :: [(Ghc.Var, LocSpecType)] -> [(Ghc.Var, LocSpecType)] 
 checkDuplicateSigs :: (Symbolic x) => [(x, F.Located t)] -> [(x, F.Located t)]

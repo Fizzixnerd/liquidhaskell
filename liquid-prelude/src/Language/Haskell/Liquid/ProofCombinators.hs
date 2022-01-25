@@ -66,7 +66,7 @@ unreachable =  ()
 -- | `x *** Admit`: x is an unfinished proof
 
 infixl 3 ***
-{-@ assume (***) :: a -> p:QED -> { if (isAdmit p) then false else true } @-}
+{-@ assume *** :: a -> p:QED -> { if (isAdmit p) then false else true } @-}
 (***) :: a -> QED -> Proof
 _ *** _ = ()
 
@@ -95,17 +95,17 @@ data QED = Admit | QED
 -- when y == x (as assumed by the operator's precondition)
 
 infixl 3 ===
-{-@ (===) :: x:a -> y:{a | y == x} -> {v:a | v == x && v == y} @-}
+{-@ === :: x:a -> y:{a | y == x} -> {v:a | v == x && v == y} @-}
 (===) :: a -> a -> a
 _ === y  = y
 
 infixl 3 =<=
-{-@ (=<=) :: x:a -> y:{a | x <= y} -> {v:a | v == y} @-}
+{-@ =<= :: x:a -> y:{a | x <= y} -> {v:a | v == y} @-}
 (=<=) :: a -> a -> a
 _ =<= y  = y
 
 infixl 3 =>=
-{-@ (=>=) :: x:a -> y:{a | x >= y}  -> {v:a | v == y} @-}
+{-@ =>= :: x:a -> y:{a | x >= y}  -> {v:a | v == y} @-}
 (=>=) :: a -> a -> a
 _ =>= y  = y
 
@@ -116,7 +116,7 @@ _ =>= y  = y
 
 infixl 3 ?
 
-{-@ (?) :: forall a b <pa :: a -> Bool, pb :: b -> Bool>. a<pa> -> b<pb> -> a<pa> @-}
+{-@ ? :: forall a b <pa :: a -> Bool, pb :: b -> Bool>. a<pa> -> b<pb> -> a<pa> @-}
 (?) :: a -> b -> a 
 x ? _ = x 
 {-# INLINE (?)   #-} 
@@ -128,7 +128,7 @@ x ? _ = x
 -------------------------------------------------------------------------------
 
 infixl 3 ==!
-{-@ assume (==!) :: x:a -> y:a -> {v:a | v == x && v == y} @-}
+{-@ assume ==! :: x:a -> y:a -> {v:a | v == x && v == y} @-}
 (==!) :: a -> a -> a
 (==!) _ y = y
 
@@ -148,13 +148,13 @@ infixl 3 ==!
 --   argument, but does not check intermediate steps.
 --   TODO: What is it USEFUL FOR?
 
-infixl 3 ==.
+-- infixl 3 ==.
 
-{-# DEPRECATED (==.) "Use (===) instead" #-}
+-- {-# DEPRECATED (==.) "Use (===) instead" #-}
 
-{-# INLINE (==.) #-} 
-(==.) :: a -> a -> a 
-_ ==. x = x 
+-- {-# INLINE (==.) #-} 
+-- (==.) :: a -> a -> a 
+-- _ ==. x = x 
 
 -------------------------------------------------------------------------------
 -- | * Combining Proof Certificates -------------------------------------------

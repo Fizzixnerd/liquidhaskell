@@ -22,13 +22,13 @@ _ *** QED = ()
 -- | functions while ignoring the equality steps. 
 -------------------------------------------------------------------------------
 
-infixl 3 ==., `eq` 
+infixl 3 ==!, `eq` 
 
 
-{-@ (==.) :: x:a -> y:{a | x == y} -> {v:a | v == y && v == x} @-}
-(==.) :: a -> a -> a 
-_ ==. x = x 
-{-# INLINE (==.) #-} 
+{-@ ==! :: x:a -> y:{a | x == y} -> {v:a | v == y && v == x} @-}
+(==!) :: a -> a -> a 
+_ ==! x = x 
+{-# INLINE (==!) #-} 
 
 
 {-@ eq :: x:a -> y:{a | x == y} -> {v:a | v == y && v == x} @-}
@@ -42,7 +42,7 @@ _ `eq` x = x
 
 infixl 3 ?
 
-{-@ (?) :: forall a b <pa :: a -> Bool>. a<pa> -> b -> a<pa> @-}
+{-@ ? :: forall a b <pa :: a -> Bool>. a<pa> -> b -> a<pa> @-}
 (?) :: a -> b -> a 
 x ? _ = x 
 {-# INLINE (?)   #-} 

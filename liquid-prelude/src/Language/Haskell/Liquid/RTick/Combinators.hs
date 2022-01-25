@@ -88,19 +88,19 @@ isAss :: QED -> Bool
 isAss ASS = True
 isAss QED = False
 
-{-@ assume (***) :: a -> qed:QED -> { if (isAss qed) then false else true } @-}
+{-@ assume *** :: a -> qed:QED -> { if (isAss qed) then false else true } @-}
 infixl 1 ***
 (***) :: a -> QED -> Proof
 _ *** _ = ()
 {-# INLINE (***) #-}
 
-{-@ (?) :: x:a -> Proof -> { v:a | x == v } @-}
+{-@ ? :: x:a -> Proof -> { v:a | x == v } @-}
 infixl 3 ?
 (?) :: a -> Proof -> a
 x ? _ = x
 {-# INLINE (?) #-}
 
-{-@ (&&&) :: Proof -> Proof -> Proof @-}
+{-@ &&& :: Proof -> Proof -> Proof @-}
 infixl 3 &&&
 (&&&) :: Proof -> Proof -> Proof
 x &&& _ = x
@@ -118,13 +118,13 @@ withTheorem x _ = x
 --
 -- Equality.
 --
-{-@ (==.) :: x:a -> { y:a | x == y } -> { v:a | x == v && y == v } @-}
+{-@ ==. :: x:a -> { y:a | x == y } -> { v:a | x == v && y == v } @-}
 infixl 3 ==.
 (==.) :: a -> a -> a
 _ ==. x = x
 {-# INLINE (==.) #-}
 
-{-@ assume (==?) :: x:a -> y:a -> { v:a | x == v && y == v } @-}
+{-@ assume ==? :: x:a -> y:a -> { v:a | x == v && y == v } @-}
 infixl 3 ==?
 (==?) :: a -> a -> a
 _ ==? x = x
@@ -146,13 +146,13 @@ _ `eq` x = x
 --
 -- Less than.
 --
-{-@ (<.) :: m:a -> { n:a | m < n } -> { o:a | o == n } @-}
+{-@ <. :: m:a -> { n:a | m < n } -> { o:a | o == n } @-}
 infixl 3 <.
 (<.) :: a -> a -> a
 _ <. n = n
 {-# INLINE (<.) #-}
 
-{-@ assume (<?) :: m:a -> n:a -> { o:a | o == n && m < n } @-}
+{-@ assume <? :: m:a -> n:a -> { o:a | o == n && m < n } @-}
 infixl 3 <?
 (<?) :: a -> a -> a
 _ <? n = n
@@ -161,13 +161,13 @@ _ <? n = n
 --
 -- Less than or equal.
 --
-{-@ (<=.) :: m:a -> { n:a | m <= n } -> { o:a | o == n } @-}
+{-@ <=. :: m:a -> { n:a | m <= n } -> { o:a | o == n } @-}
 infixl 3 <=.
 (<=.) :: a -> a -> a
 _ <=. n = n
 {-# INLINE (<=.) #-}
 
-{-@ assume (<=?) :: m:a -> n:a -> { o:a | o == n && m <= n } @-}
+{-@ assume <=? :: m:a -> n:a -> { o:a | o == n && m <= n } @-}
 infixl 3 <=?
 (<=?) :: a -> a -> a
 _ <=? n = n
@@ -176,13 +176,13 @@ _ <=? n = n
 --
 -- Greater than.
 --
-{-@ (>.) :: m:a -> { n:a | m > n } -> { o:a | o == n } @-}
+{-@ >. :: m:a -> { n:a | m > n } -> { o:a | o == n } @-}
 infixl 3 >.
 (>.) :: a -> a -> a
 _ >. y = y
 {-# INLINE (>.) #-}
 
-{-@ assume (>?) :: m:a -> n:a -> { o:a | o == n && m > n } @-}
+{-@ assume >? :: m:a -> n:a -> { o:a | o == n && m > n } @-}
 infixl 3 >?
 (>?) :: a -> a -> a
 _ >? y = y
@@ -191,13 +191,13 @@ _ >? y = y
 --
 -- Greater than or equal.
 --
-{-@ (>=.) :: m:a -> { n:a | m >= n } -> { o:a | o == n } @-}
+{-@ >=. :: m:a -> { n:a | m >= n } -> { o:a | o == n } @-}
 infixl 3 >=.
 (>=.) :: a -> a -> a
 _ >=. n = n
 {-# INLINE (>=.) #-}
 
-{-@ assume (>=?) :: m:a -> n:a -> { o:a | o == n && m >= n } @-}
+{-@ assume >=? :: m:a -> n:a -> { o:a | o == n && m >= n } @-}
 infixl 3 >=?
 (>=?) :: a -> a -> a
 _ >=? n = n
@@ -208,7 +208,7 @@ _ >=? n = n
 --
 {-@ predicate COSTEQ T1 T2 = tval T1 == tval T2 && tcost T1 == tcost T2 @-}
 
-{-@ (<=>.)
+{-@ <=>.
       :: t1:Tick a
       -> { t2:Tick a | COSTEQ t1 t2 }
       -> { t3:Tick a | COSTEQ t1 t2 && COSTEQ t1 t3 && COSTEQ t2 t3 }
@@ -218,7 +218,7 @@ infixl 3 <=>.
 (<=>.) _ t2 = t2
 {-# INLINE (<=>.) #-}
 
-{-@ assume (<=>?)
+{-@ assume <=>?
       :: t1:Tick a -> t2:Tick a
       -> { t3:Tick a | COSTEQ t1 t2 && COSTEQ t1 t3 && t2 == t3 }
 @-}
@@ -232,7 +232,7 @@ infixl 3 <=>?
 --
 {-@ predicate IMP T1 T2 = tval T1 == tval T2 && tcost T1 >= tcost T2 @-}
 
-{-@ (>~>.)
+{-@ >~>.
       :: t1:Tick a
       -> { t2:Tick a | IMP t1 t2 }
       -> { t3:Tick a | IMP t1 t2 && IMP t1 t3 && t2 == t3 }
@@ -242,7 +242,7 @@ infixl 3 >~>.
 (>~>.) _ t2 = t2
 {-# INLINE (>~>.) #-}
 
-{-@ assume (>~>?)
+{-@ assume >~>?
       :: t1:Tick a -> t2:Tick a
       -> { t3:Tick a | IMP t1 t2 && IMP t1 t3 && t2 == t3 }
 @-}
@@ -256,7 +256,7 @@ infixl 3 >~>?
 --
 {-@ predicate QIMP T1 N T2 = tval T1 == tval T2 && tcost T1 == tcost T2 + N @-}
 
-{-@ (.>==)
+{-@ .>==
       :: t1:Tick a
       -> n:Int
       -> { t2:Tick a | QIMP t1 n t2 }
@@ -267,7 +267,7 @@ infixl 3 .>==
 (.>==) _ _ t2 = t2
 {-# INLINE (.>==) #-}
 
-{-@ assume (?>==)
+{-@ assume ?>==
      :: t1:Tick a -> n:Nat -> t2:Tick a
      -> { t3:Tick a | QIMP t1 n t2 && QIMP t1 n t3 && t2 == t3 }
 @-}
@@ -281,7 +281,7 @@ infixl 3 ?>==
 --
 {-@ predicate DIM T1 T2 = tval T1 == tval T2 && tcost T1 <= tcost T2 @-}
 
-{-@ (<~<.)
+{-@ <~<.
       :: t1:Tick a
       -> { t2:Tick a | DIM t1 t2 }
       -> { t3:Tick a | DIM t1 t2 && DIM t1 t3 && t2 == t3 }
@@ -291,7 +291,7 @@ infixl 3 <~<.
 (<~<.) _ t2 = t2
 {-# INLINE (<~<.) #-}
 
-{-@ assume (<~<?)
+{-@ assume <~<?
      :: t1:Tick a -> t2:Tick a
      -> { t3:Tick a | DIM t1 t2 && DIM t1 t3 && t2 == t3 }
 @-}
@@ -305,7 +305,7 @@ infixl 3 <~<?
 --
 {-@ predicate QDIM T1 N T2 = tval T1 == tval T2 && tcost T1 + N == tcost T2 @-}
 
-{-@ (.<==)
+{-@ .<==
       :: t1:Tick a
       -> n:Nat
       -> { t2:Tick a | QDIM t1 n t2 }
@@ -316,7 +316,7 @@ infixl 3 .<==
 (.<==) _ _ t2 = t2
 {-# INLINE (.<==) #-}
 
-{-@ assume (?<==)
+{-@ assume ?<==
       :: t1:Tick a -> n:Nat -> t2:Tick a
       -> { t3:Tick a | QDIM t1 n t2 && QDIM t1 n t3 && t2 == t3 }
 @-}
@@ -332,7 +332,7 @@ infixl 3 ?<==
 --
 -- Quantified improvement.
 --
-{-@ (==>.) :: (a -> b) -> a -> b @-}
+{-@ ==>. :: (a -> b) -> a -> b @-}
 infixl 3 ==>.
 (==>.) :: (a -> b) -> a -> b
 f ==>. a = f a
@@ -341,7 +341,7 @@ f ==>. a = f a
 --
 -- Quantified improvement (assumption).
 --
-{-@ (==>?) :: (a -> b) -> a -> b @-}
+{-@ ==>? :: (a -> b) -> a -> b @-}
 infixl 3 ==>?
 (==>?) :: (a -> b) -> a -> b
 f ==>? a = f a
@@ -350,7 +350,7 @@ f ==>? a = f a
 --
 -- Quantified diminishment.
 --
-{-@ (==<.) :: (a -> b) -> a -> b @-}
+{-@ ==<. :: (a -> b) -> a -> b @-}
 infixl 3 ==<.
 (==<.) :: (a -> b) -> a -> b
 f ==<. a = f a
@@ -359,7 +359,7 @@ f ==<. a = f a
 --
 -- Quantified diminishment (assumption).
 --
-{-@ (==<?) :: (a -> b) -> a -> b @-}
+{-@ ==<? :: (a -> b) -> a -> b @-}
 infixl 3 ==<?
 (==<?) :: (a -> b) -> a -> b
 f ==<? a = f a
