@@ -179,25 +179,38 @@ makeTargetSpec cfg lmap targetSrc bareSpec_ dependencies = do
     bareSpec :: BareSpec
     bareSpec = MkBareSpec $ (getBareSpec bareSpec_)
                { sigs = F.tracepp "sigs"
-                        $ uniquify
+
                         $ (getThe sigs bareSpec_)
                           <> (getThe sigs autoliftedSigsSpec) }
       where
         getThe f = f . getBareSpec
-        uniquify = L.nubBy (\x y -> let f = (F.val . fst) in f x == f y)
+        _uniquify = uniquifyBy head (\x y -> let f = (F.val . fst) in f x == f y) . L.sortOn (F.val . fst)
         env = Bare.makeEnv cfg (review targetSrcIso targetSrc) lmap [(giTargetMod targetSrc, getBareSpec bareSpec_)]
-        autoliftedSigsSpec = makeAutoLiftedSigs env (giTargetMod targetSrc) True (giDefVars targetSrc) (giTarget targetSrc)
+        autoliftedSigsSpec = makeAutoLiftedSigs env (giTargetMod targetSrc) True (Bare.srcThings $ review targetSrcIso targetSrc) (giTarget targetSrc)
 
-makeAutoLiftedSigs :: Bare.Env -> ModName -> Bool -> [Ghc.Var] -> FilePath -> BareSpec
-makeAutoLiftedSigs _env _modName cond vars target =
-  let localUniques = filter (isLocInFile target) vars
-      types = localUniques
-              & fmap (\v ->
-                        let located = GM.locNamedThing v
-                        in (F.tracepp "dummy qualified" . F.symbol <$> located, bareAutoLiftedOfType . Ghc.varType <$> located))
+uniquifyBy :: PPrint a => ([a] -> a) -> (a -> a -> Bool) -> [a] -> [a]
+uniquifyBy summarizer grouper xs = F.tracepp "uniquifyBy summarized" $ fmap summarizer (F.tracepp "uniquifyBy grouped" $ L.groupBy grouper xs)
+
+makeAutoLiftedSigs :: Bare.Env -> ModName -> Bool -> [Ghc.TyThing] -> FilePath -> BareSpec
+makeAutoLiftedSigs _env _modName cond tyThings _target =
+  let sigs = tyThings
+             & concatMap (\thing ->
+                             let located = GM.locNamedThing thing
+                             in case thing of
+                                  Ghc.AnId i ->
+                                    let symbol = F.symbol . Ghc.getName . const i <$> located
+                                    in
+                                      if Ghc.isLocalVar i
+                                      then case Ghc.idDetails i of
+                                             Ghc.RecSelId _ _ -> mempty
+                                             Ghc.DataConWorkId _ -> mempty
+                                             Ghc.DataConWrapId _ -> mempty
+                                             _ -> [(symbol, (\y -> F.tracepp "bareAutoLiftedOfType ppr" y) . bareAutoLiftedOfType . (\x -> seq (F.tracepp ("varType ppr " ++ GM.showPpr x ++ " of " ++ GM.showPpr i) x) x) . Ghc.varType . const i <$> located)]
+                                      else mempty
+                                  _ -> mempty)
   in
     if cond
-    then MkBareSpec $ mempty { sigs = F.tracepp "types" types }
+    then MkBareSpec $ mempty { sigs = sigs }
     else mempty
 
 -------------------------------------------------------------------------------------
@@ -811,11 +824,14 @@ makeTySigs env sigEnv name spec = do
 bareTySigs :: Bare.Env -> ModName -> Ms.BareSpec -> Bare.Lookup [(Ghc.Var, LocBareType)]
 bareTySigs env name spec = checkDuplicateSigs <$> vts
   where
-    vts = return $ F.tracepp "bareTySigs" $ uniqNubWith fst $ concat $ (flip fmap (Ms.sigs spec ++ Ms.localSigs spec) $ \(x, t) -> do 
-                         let v = F.notracepp "LOOKUP-GHC-VAR" $ Bare.lookupGhcVar env name "rawTySigs" x
-                         case v of
-                           Left _ -> []
-                           Right v' -> [(v', t)])
+    vts = return
+          $ F.tracepp "bareTySigs"
+          $ concatMap (\(x, t) -> do
+                          let v = F.notracepp "LOOKUP-GHC-VAR" $ Bare.lookupGhcVar env name "rawTySigs" x
+                          case v of
+                            Left _ -> []
+                            Right v' -> [(v', t)])
+          $ Ms.sigs spec ++ Ms.localSigs spec
 
 -- checkDuplicateSigs :: [(Ghc.Var, LocSpecType)] -> [(Ghc.Var, LocSpecType)] 
 checkDuplicateSigs :: (Symbolic x) => [(x, F.Located t)] -> [(x, F.Located t)]

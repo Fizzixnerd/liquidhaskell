@@ -67,7 +67,6 @@ gt x y = x > y
 liquidAssertB :: Bool -> Bool
 liquidAssertB b = b
 
-{-@ ignore liquidAssert @-}
 {-@ liquidAssert :: {v:Bool | v} -> a -> a  @-}
 {-# NOINLINE liquidAssert #-}
 liquidAssert :: Bool -> a -> a
@@ -77,7 +76,7 @@ liquidAssert _ x = x
 {-@ liquidAssume :: b:Bool -> a -> {v: a | b}  @-}
 {-# NOINLINE liquidAssume #-}
 liquidAssume :: Bool -> a -> a
-liquidAssume b x = if b then x else error "liquidfails"
+liquidAssume b x = if b then x else error "liquidAssume fails"
 
 {-@ ignore liquidAssumeB @-}
 {-@ liquidAssumeB :: forall <p :: a -> Bool>. (a<p> -> {v:Bool| v}) -> a -> a<p> @-}
@@ -92,7 +91,6 @@ unsafeError :: String -> a
 unsafeError = error
 
 
-{-@ ignore liquidError @-}
 {-@ liquidError :: {v:String | 0 = 1} -> a  @-}
 {-# NOINLINE liquidError #-}
 liquidError :: String -> a
@@ -116,11 +114,18 @@ choose = undefined
 -------------------------------------------------------------------
 
 -- tedium because fixpoint doesn't want to deal with (x mod y) only (x mod c)
+{-@ isEven :: x:Int -> {v:Bool | ((v) <=> ((x mod 2) = 0))} @-}
+{-# NOINLINE isEven #-}
+isEven   :: Int -> Bool
+isEven x = x `mod` 2 == 0
 
+{-@ isOdd :: x:Int -> {v:Bool | ((v) <=> ((x mod 2) = 1))} @-}
+{-# NOINLINE isOdd #-}
+isOdd   :: Int -> Bool
+isOdd x = x `mod` 2 == 1
 
 -----------------------------------------------------------------------------------------------
 
-{-@ ignore safeZipWith @-}
 {-@ safeZipWith :: (a -> b -> c) -> xs : [a] -> ys:{v:[b] | len v = len xs} 
                 -> {v : [c] | len v = len xs } @-}
 safeZipWith :: (a->b->c) -> [a]->[b]->[c]

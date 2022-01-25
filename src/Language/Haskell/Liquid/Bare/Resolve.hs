@@ -20,6 +20,7 @@ module Language.Haskell.Liquid.Bare.Resolve
   , Qualify (..)
   , Lookup
   , qualifyTop, qualifyTopDummy
+  , unQualifySymbol
   
   -- * Looking up names
   , maybeResolveSym 
@@ -35,7 +36,9 @@ module Language.Haskell.Liquid.Bare.Resolve
   , knownGhcDataCon 
   , knownGhcType 
 
-  -- * Misc 
+  -- * Misc
+  , tyThingSymbol
+  , srcThings
   , srcVars
   , localBinds
   , coSubRReft

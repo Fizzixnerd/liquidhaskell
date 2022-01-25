@@ -481,7 +481,7 @@ exprArg l msg = F.notracepp ("exprArg: " ++ msg) . go
 cookSpecType :: Bare.Env -> Bare.SigEnv -> ModName -> Bare.PlugTV Ghc.Var -> LocBareType 
              -> LocSpecType 
 cookSpecType env sigEnv name x bt
-         = either Ex.throw (F.tracepp "cookSpecType -- after") (cookSpecTypeE env sigEnv name (F.tracepp ("cookSpecType -- x: " <> GM.showPpr (Ghc.varType <$> Bare.plugSrc x)) x) (F.tracepp "cookSpecType -- before" bt))
+         = either Ex.throw (F.tracepp "cookSpecType -- after") (cookSpecTypeE env sigEnv name x bt)
   where 
     _msg = "cookSpecType: " ++ GM.showPpr (z, Ghc.varType <$> z)
     z    = Bare.plugSrc x 
@@ -502,7 +502,7 @@ cookSpecTypeE env sigEnv name@(ModName _ _) x bt
   -- since ghci will not be able to recognize fully qualified names
   -- instead, we leave qualification to ghc elaboration
   . fmap (Bare.qualifyTop env name l )
-  . bareSpecType       env name 
+  . bareSpecType       env name
   . bareExpandType     rtEnv
   $ bt
   where
