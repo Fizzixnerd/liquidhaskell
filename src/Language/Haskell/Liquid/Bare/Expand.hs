@@ -271,7 +271,7 @@ class Expand a where
 -- because the type alias entry inside 'BareRTEnv' mentioned the tuple (\"OneTyAlias\", \"{v:a | oneFunPred v}\") but
 -- the 'snd' element needed to be qualified as well, before trying to expand anything.
 ----------------------------------------------------------------------------------
-qualifyExpand :: (PPrint a, Expand a, Bare.Qualify a)
+qualifyExpand :: (Expand a, Bare.Qualify a)
               => Bare.Env -> ModName -> BareRTEnv -> F.SourcePos -> [F.Symbol] -> a -> a
 ----------------------------------------------------------------------------------
 qualifyExpand env name rtEnv l bs
@@ -381,6 +381,27 @@ expandBareSpec rtEnv l sp = sp
   , newtyDecls = expand rtEnv l (newtyDecls sp)
   }
   where f      = expand rtEnv l
+
+expandTycEnv :: BareRTEnv -> F.SourcePos -> Bare.TycEnv -> Bare.TycEnv
+expandTycEnv rtEnv l tycEnv = tycEnv
+  { Bare.tcSelMeasures = expand rtEnv l (Bare.tcSelMeasures tycEnv)
+  , Bare.tcDataCons = expand rtEnv l (Bare.tcDataCons tycEnv) }
+
+instance Expand Bare.TycEnv where
+  expand = expandTycEnv
+
+instance Expand DataConP where
+  expand rtEnv l dcp = dcp
+    { dcpTyArgs = fmap (expand rtEnv l) <$> (dcpTyArgs dcp)
+    , dcpTyRes = expand rtEnv l <$> (dcpTyRes dcp) }
+
+
+expandMeasure :: Expand ty => BareRTEnv -> F.SourcePos -> Measure ty Ghc.DataCon -> Measure ty Ghc.DataCon
+expandMeasure rtEnv l ms = ms
+  { msSort = expand rtEnv l (msSort ms) }
+
+instance Expand ty => Expand (Measure ty Ghc.DataCon) where
+  expand = expandMeasure
 
 expandBareType :: BareRTEnv -> F.SourcePos -> BareType -> BareType 
 expandBareType rtEnv _ = go 

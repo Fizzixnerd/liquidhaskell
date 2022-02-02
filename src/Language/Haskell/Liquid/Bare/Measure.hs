@@ -225,12 +225,14 @@ tyConDataName full tc
     vanillaTc  = Ghc.isVanillaAlgTyCon tc
     dcs        = Misc.sortOn F.symbol (Ghc.tyConDataCons tc)
 
+-- IMPORTANT
 dataConDecl :: Ghc.DataCon -> DataCtor
 dataConDecl d     = {- F.notracepp msg $ -} DataCtor dx (F.symbol <$> as) [] xts outT
   where
     isGadt        = not (Ghc.isVanillaDataCon d)
     -- msg           = printf "dataConDecl (gadt = %s)" (show isGadt)
-    xts           = [(Bare.makeDataConSelector Nothing d i, RT.bareOfType t) | (i, t) <- its ]
+    -- THIS TURNS IT INTO NAT'' IN THE DATACONDECL
+    xts           = [(Bare.makeDataConSelector Nothing d i, RT.bareOfTypeNoExpand t) | (i, t) <- its ]
     dx            = F.symbol <$> GM.locNamedThing d
     its           = zip [1..] ts
     (as,_ps,ts,t)  = Ghc.dataConSig d
@@ -296,7 +298,7 @@ bkDataCon permitTC dc nFlds  = (as, ts, (F.dummySymbol, classRFInfo permitTC, t,
   where
     ts                = RT.ofType <$> Misc.takeLast nFlds (map Ghc.irrelevantMult _ts)
     t                 = -- Misc.traceShow ("bkDataConResult" ++ GM.showPpr (dc, _t, _t0)) $
-                          RT.ofType  $ Ghc.mkTyConApp tc tArgs'
+                          RT.ofType $ Ghc.mkTyConApp tc tArgs'
     as                = makeRTVar . RT.rTyVar <$> (αs ++ αs')
     ((αs,αs',_,_,_ts,_t), _t0) = hammer dc
     tArgs'            = take (nArgs - nVars) tArgs ++ (Ghc.mkTyVarTy <$> αs)

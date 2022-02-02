@@ -44,7 +44,7 @@ module Language.Haskell.Liquid.Types.RefType (
   , quantifyFreeRTy
 
   -- * RType constructors
-  , ofType, toType, bareOfType
+  , ofType, toType, bareOfType, ofTypeNoExpand, bareOfTypeNoExpand, ofTypeNoExpand', bareOfTypeNoExpand
   , bTyVar, rTyVar, rVar, rApp, gApp, rEx
   , symbolRTyVar, bareRTyVar
   , tyConBTyCon
@@ -1366,29 +1366,70 @@ subvPredicate :: (UsedPVar -> UsedPVar) -> Predicate -> Predicate
 subvPredicate f (Pr pvs) = Pr (f <$> pvs)
 
 --------------------------------------------------------------------------------
-ofType :: Monoid r => Type -> RRType r
+ofTypeNoExpand' :: Monoid r => Type -> RRType r
 --------------------------------------------------------------------------------
-ofType      = ofType_ $ TyConv
+ofTypeNoExpand'      = ofType_ specTyConv
+
+--------------------------------------------------------------------------------
+ofTypeNoExpand :: Monoid r => Type -> RRType r
+--------------------------------------------------------------------------------
+ofTypeNoExpand      = ofTypeNoExpand_ specTyConv
+
+
+specTyConv :: Monoid r => TyConv RTyCon RTyVar r
+specTyConv = TyConv
   { tcFVar  = rVar
   , tcFTVar = rTVar
   , tcFApp  = \c ts -> rApp c ts [] mempty
   , tcFLit  = ofLitType rApp
   }
 
+ofType :: Monoid r => Type -> RRType r
+ofType =  ofType_ specTyConv . expandTypeSynonyms
+
 --------------------------------------------------------------------------------
-bareOfType :: Monoid r => Type -> BRType r
+bareOfTypeNoExpand :: Monoid r => Type -> BRType r
 --------------------------------------------------------------------------------
-bareOfType  = ofType_ $ TyConv
+bareOfTypeNoExpand  = ofTypeNoExpand_ bareTyConv
+
+bareTyConv :: Monoid m => TyConv BTyCon BTyVar m
+bareTyConv = TyConv
   { tcFVar  = (`RVar` mempty) . BTV . symbol
   , tcFTVar = bTVar
   , tcFApp  = \c ts -> bApp c ts [] mempty
   , tcFLit  = ofLitType bApp
   }
 
+bareOfType :: Monoid r => Type -> BRType r
+bareOfType = ofType_ bareTyConv . expandTypeSynonyms
+
+ofTypeNoExpand_ :: Monoid r => TyConv c tv r -> Type -> RType c tv r
+ofTypeNoExpand_ tx = go
+  where
+    go (TyVarTy α)
+      = tcFVar tx α
+    go (FunTy _ _ τ τ')
+      = rFun dummySymbol (go τ) (go τ')
+    go (ForAllTy (Bndr α _) τ)
+      = RAllT (tcFTVar tx α) (go τ) mempty
+    go (TyConApp c τs)
+      -- | Just (αs, τ) <- Ghc.synTyConDefn_maybe c
+      -- = go (substTyWith αs τs τ)
+      | otherwise
+      = tcFApp tx c (go <$> τs) -- [] mempty
+    go (AppTy t1 t2)
+      = RAppTy (go t1) (go t2) mempty
+    go (LitTy x)
+      = tcFLit tx x
+    go (CastTy t _)
+      = go t
+    go (CoercionTy _)
+      = errorstar "Coercion is currently not supported"
+
 --------------------------------------------------------------------------------
 ofType_ :: Monoid r => TyConv c tv r -> Type -> RType c tv r
 --------------------------------------------------------------------------------
-ofType_ tx = go . expandTypeSynonyms
+ofType_ tx = go
   where
     go (TyVarTy α)
       = tcFVar tx α
@@ -1402,7 +1443,7 @@ ofType_ tx = go . expandTypeSynonyms
       | otherwise
       = tcFApp tx c (go <$> τs) -- [] mempty
     go (AppTy t1 t2)
-      = RAppTy (go t1) (ofType_ tx t2) mempty
+      = RAppTy (go t1) (go t2) mempty
     go (LitTy x)
       = tcFLit tx x
     go (CastTy t _)

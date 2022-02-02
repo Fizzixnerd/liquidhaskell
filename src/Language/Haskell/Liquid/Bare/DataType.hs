@@ -42,7 +42,7 @@ import           Language.Haskell.Liquid.WiredIn
 
 import qualified Language.Haskell.Liquid.Measure        as Ms
 import qualified Language.Haskell.Liquid.Bare.Types     as Bare  
-import qualified Language.Haskell.Liquid.Bare.Resolve   as Bare 
+import qualified Language.Haskell.Liquid.Bare.Resolve   as Bare
 import           Text.Printf                     (printf)
 import Text.PrettyPrint ((<+>))
 
@@ -73,11 +73,14 @@ makeDataConChecker = F.testSymbol . F.symbol
 --   equivalent to `head` and `tail`.
 --------------------------------------------------------------------------------
 makeDataConSelector :: Maybe Bare.DataConMap -> Ghc.DataCon -> Int -> F.Symbol
-makeDataConSelector dmMb d i = M.lookupDefault def (F.symbol d, i) dm
-  where 
-    dm                       = Mb.fromMaybe M.empty dmMb 
+makeDataConSelector dmMb d i
+  | Just ithField <- ithFieldMb = F.symbol (Ghc.flSelector ithField)
+  | otherwise = M.lookupDefault def (F.symbol d, i) dm
+  where
+    fields = Ghc.dataConFieldLabels d
+    ithFieldMb = Misc.getNth (i - 1) fields
+    dm                       = Mb.fromMaybe M.empty dmMb
     def                      = makeDataConSelector' d i
- 
 
 makeDataConSelector' :: Ghc.DataCon -> Int -> F.Symbol
 makeDataConSelector' d i
@@ -412,7 +415,7 @@ left' es = Just (Left es)
 --   instead of the unlifted versions.
 
 canonizeDecls :: Bare.Env -> ModName -> [DataDecl] -> Bare.Lookup [DataDecl]
-canonizeDecls env name ds = do
+canonizeDecls env name ds = seq (F.tracepp "" ds) $ do
   kds <- forM ds $ \d -> do
            k <- dataDeclKey env name d 
            return (fmap (, d) k)
@@ -590,7 +593,7 @@ ofBDataCtorTc env name l l' tc αs ps πs _ctor@(DataCtor _c as _ xts res) c' =
     ts'           = Bare.ofBareType env name l (Just ps) <$> ts
     res'          = Bare.ofBareType env name l (Just ps) <$> res
     t0'           = dataConResultTy c' αs t0 res'
-    _cfg          = getConfig env 
+    _cfg          = getConfig env
     (yts, ot)     = qualifyDataCtor (not isGadt) name dLoc (zip xs ts', t0')
     zts           = zipWith (normalizeField c') [1..] (reverse yts)
     usedTvs       = S.fromList (ty_var_value <$> concatMap RT.freeTyVars (t0':ts'))
@@ -734,7 +737,7 @@ unDummy x i | x /= F.dummySymbol = x
             | otherwise          = F.symbol ("_cls_lq" ++ show i)
 
 makeRecordSelectorSigs :: Bare.Env -> ModName -> [Located DataConP] -> [(Ghc.Var, LocSpecType)]
-makeRecordSelectorSigs env name = checkRecordSelectorSigs . concatMap makeOne
+makeRecordSelectorSigs env name l = checkRecordSelectorSigs $ concatMap makeOne l
   where
   makeOne (Loc l l' dcp)
     | Just cls <- maybe_cls
@@ -770,4 +773,4 @@ makeRecordSelectorSigs env name = checkRecordSelectorSigs . concatMap makeOne
       -- FIXME: this is clearly imprecise, but the preds in the DataConP seem
       -- to be malformed. If we leave them in, tests/pos/kmp.hs fails with
       -- a malformed predicate application. Niki, help!!
-      dropPreds = fmap (\(MkUReft r _ps) -> MkUReft r mempty)
+      dropPreds = id -- fmap (\(MkUReft r _ps) -> MkUReft r mempty)

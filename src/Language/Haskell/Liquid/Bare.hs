@@ -326,7 +326,8 @@ makeGhcSpec0 cfg src lmap mspecsNoCls = do
     lSpec0   = makeLiftedSpec0 cfg src embs lmap mySpec0 
     embs     = makeEmbeds          src env ((name, mySpec0) : M.toList iSpecs0)
     dm       = Bare.tcDataConMap tycEnv0
-    (dg0, datacons, tycEnv0) = makeTycEnv0   cfg name env embs mySpec2 iSpecs2 
+    (dg0, datacons, tycEnv0') = makeTycEnv0   cfg name env embs mySpec2 iSpecs2
+    tycEnv0  = Bare.qualifyExpand env name rtEnv l [] tycEnv0' where l = F.dummyPos "expand-tycEnv0"
     -- extract name and specs
     env      = Bare.makeEnv cfg src lmap mspecsNoCls
     (mySpec0NoCls, iSpecs0) = splitSpecs name src mspecsNoCls
@@ -753,7 +754,7 @@ makeInlSigs env rtEnv
 
 makeMsrSigs :: Bare.Env -> BareRTEnv -> [(ModName, Ms.BareSpec)] -> [(Ghc.Var, LocSpecType)] 
 makeMsrSigs env rtEnv 
-  = makeLiftedSigs rtEnv (CoreToLogic.inlineSpecType (typeclass (getConfig env)))
+  = makeLiftedSigs rtEnv (CoreToLogic.measureSpecType (typeclass (getConfig env)))
   . makeFromSet "hmeas" Ms.hmeas env 
 
 makeLiftedSigs :: BareRTEnv -> (Ghc.Var -> SpecType) -> [Ghc.Var] -> [(Ghc.Var, LocSpecType)]
@@ -1075,7 +1076,7 @@ makeTycEnv0 cfg myName env embs mySpec iSpecs = (diag0 <> diag1, datacons, Bare.
   })
   where
     (tcDds, dcs)   = conTys
-    (diag0, conTys) = withDiagnostics $ Bare.makeConTypes myName env specs 
+    (diag0, conTys) = (withDiagnostics $ Bare.makeConTypes myName env specs)
     specs         = (myName, mySpec) : M.toList iSpecs
     tcs           = Misc.snd3 <$> tcDds 
     tyi           = Bare.qualifyTopDummy env myName (makeTyConInfo embs fiTcs tycons)

@@ -425,7 +425,17 @@ substEnv :: (F.Subable a) => Env -> ModName -> F.SourcePos -> [F.Symbol] -> a ->
 substEnv env name l bs = F.substa (qualifySymbol env name l bs) 
 
 instance Qualify SpecType where 
-  qualify x1 x2 x3 x4 x5 = emapReft (substFreeEnv x1 x2 x3) x4 x5            
+  qualify x1 x2 x3 x4 x5 = emapReft (substFreeEnv x1 x2 x3) x4 x5
+
+instance Qualify TycEnv where
+  qualify env name l bs tycEnv = tycEnv
+    { tcSelMeasures = qualify env name l bs (tcSelMeasures tycEnv)
+    , tcDataCons = qualify env name l bs (tcDataCons tycEnv) }
+
+instance Qualify DataConP where
+  qualify env name n bs dcp = dcp
+    { dcpTyArgs = qualify env name n bs <$> (dcpTyArgs dcp)
+    , dcpTyRes = qualify env name n bs <$> (dcpTyRes dcp) }
 
 instance Qualify BareType where 
   qualify x1 x2 x3 x4 x5 = emapReft (substFreeEnv x1 x2 x3) x4 x5 
@@ -914,7 +924,8 @@ bareTCApp :: (Expandable r)
 bareTCApp r (Loc l _ c) rs ts | Just rhs <- Ghc.synTyConRhs_maybe c
   = if (GM.kindTCArity c < length ts) 
       then Ex.throw err -- error (F.showpp err)
-      else tyApp (RT.subsTyVars_meet su $ RT.ofType rhs) (drop nts ts) rs r
+      -- STOPS EXPANSION of NAT'' to INT
+      else tyApp (RT.subsTyVars_meet su $ RT.ofTypeNoExpand (Ghc.mkTyConTy c)) (drop nts ts) rs r
     where
        tvs = [ v | (v, b) <- zip (GM.tyConTyVarsDef c) (Ghc.tyConBinders c), GM.isAnonBinder b]
        su  = zipWith (\a t -> (RT.rTyVar a, toRSort t, t)) tvs ts
