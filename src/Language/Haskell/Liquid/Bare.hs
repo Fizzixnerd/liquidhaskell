@@ -58,7 +58,7 @@ import qualified Language.Haskell.Liquid.Bare.ToBare        as Bare
 import qualified Language.Haskell.Liquid.Bare.Class         as Bare 
 import qualified Language.Haskell.Liquid.Bare.Check         as Bare 
 import qualified Language.Haskell.Liquid.Bare.Laws          as Bare
-import qualified Language.Haskell.Liquid.Bare.Typeclass     as Bare 
+import qualified Language.Haskell.Liquid.Bare.Typeclass     as Bare
 import qualified Language.Haskell.Liquid.Transforms.CoreToLogic as CoreToLogic 
 import           Control.Arrow                    (second)
 import Data.Hashable (Hashable)
@@ -326,7 +326,8 @@ makeGhcSpec0 cfg src lmap mspecsNoCls = do
     lSpec0   = makeLiftedSpec0 cfg src embs lmap mySpec0 
     embs     = makeEmbeds          src env ((name, mySpec0) : M.toList iSpecs0)
     dm       = Bare.tcDataConMap tycEnv0
-    (dg0, datacons, tycEnv0') = makeTycEnv0   cfg name env embs mySpec2 iSpecs2
+    (dg0, datacons', tycEnv0') = makeTycEnv0   cfg name env embs mySpec2 iSpecs2
+    datacons = Bare.qualifyExpand env name rtEnv l [] datacons' where l = F.dummyPos "expand-datacons"
     tycEnv0  = Bare.qualifyExpand env name rtEnv l [] tycEnv0' where l = F.dummyPos "expand-tycEnv0"
     -- extract name and specs
     env      = Bare.makeEnv cfg src lmap mspecsNoCls

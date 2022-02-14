@@ -415,7 +415,7 @@ left' es = Just (Left es)
 --   instead of the unlifted versions.
 
 canonizeDecls :: Bare.Env -> ModName -> [DataDecl] -> Bare.Lookup [DataDecl]
-canonizeDecls env name ds = seq (F.tracepp "" ds) $ do
+canonizeDecls env name ds = do
   kds <- forM ds $ \d -> do
            k <- dataDeclKey env name d 
            return (fmap (, d) k)

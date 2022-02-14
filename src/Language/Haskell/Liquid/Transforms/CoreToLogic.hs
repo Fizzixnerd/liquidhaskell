@@ -94,7 +94,7 @@ measureSpecType allowTC v = go mkT [] [(1::Int)..] t
         | otherwise = exprReft  
     mkT xs          = MkUReft (mkR $ mkEApp f (EVar <$> reverse xs)) mempty
     f               = dummyLoc (symbol v) 
-    t               = ofTypeNoExpand (GM.expandVarType v) :: SpecType
+    t               = ofType (GM.expandVarType v) :: SpecType
     boolRes         =  isBool $ ty_res $ toRTypeRep t 
 
     go f args i (RAllT a t r)    = RAllT a (go f args i t) r 

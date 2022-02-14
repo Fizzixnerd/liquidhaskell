@@ -44,7 +44,7 @@ module Language.Haskell.Liquid.Types.RefType (
   , quantifyFreeRTy
 
   -- * RType constructors
-  , ofType, toType, bareOfType, ofTypeNoExpand, bareOfTypeNoExpand, ofTypeNoExpand', bareOfTypeNoExpand
+  , ofType, toType, bareOfType, ofTypeNoExpand, bareOfTypeNoExpand, ofTypeNoExpand'
   , bTyVar, rTyVar, rVar, rApp, gApp, rEx
   , symbolRTyVar, bareRTyVar
   , tyConBTyCon

@@ -1,23 +1,9 @@
 {-@ LIQUID "--exact-data-cons" @-}
 
--- data decl in LH is missing but uses a LH-refined type alias correctly
+{-@ type Nat = { i:Int | i >= 0 } @-}
+type Nat = Int
 
-module AutoliftedFields000 where
+f :: Int -> Nat
+f x = x
 
-{-@ type Nat'' = { v : Int | v >= 0 } @-}
-type Nat'' = Int
-
-data T = T { getT :: Nat'' }
-
-{-@ f :: Int -> Nat'' @-}
-f :: Int -> Nat''
-f = getT . T
-
-g :: Int -> Nat''
-g z = getT (T z)
-
-x :: T
-x = T 0
-
-y :: Nat''
-y = getT x
+main = print (f 0)
