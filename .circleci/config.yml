@@ -91,7 +91,7 @@ commands:
           # Used to catch regressions in verification
           name: Test benchmarks
           command: |
-            cabal v2-build -j2 --project-file << parameters.project_file >> << parameters.extra_build_flags >> stitch-lh
+            cabal v2-build -j2 --project-file << parameters.project_file >> << parameters.extra_test_flags >> stitch-lh
           no_output_timeout: 30m
 
       - store_test_results:
