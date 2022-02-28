@@ -8,6 +8,7 @@ packages: .
           ./liquid-prelude
           ./liquid-vector
           ./liquid-platform
+          ./stitch-lh
 
 source-repository-package
     type: git

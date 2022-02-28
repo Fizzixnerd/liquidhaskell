@@ -4,3 +4,6 @@
 [submodule "ghc-options"]
 	path = ghc-options
 	url = https://github.com/ranjitjhala/ghc-options.git
+[submodule "stitch-lh"]
+	path = stitch-lh
+	url = https://github.com/facundominguez/stitch-lh
