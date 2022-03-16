@@ -1,6 +1,9 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, DefaultSignatures,
              FlexibleContexts, MultiParamTypeClasses #-}
 
+-- This is here to disable Liquid from tests.hs
+{-# OPTIONS_GHC -fclear-plugins #-}
+
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Language.Stitch.LH.Monad
