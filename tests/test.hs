@@ -777,11 +777,11 @@ extraOptions dir absDir testFileFullPath = mappend (dirOpts dir) (testOpts testF
 ---------------------------------------------------------------------------
 testCmd :: FilePath -> FilePath -> FilePath -> SmtSolver -> ExtraOptions -> String
 ---------------------------------------------------------------------------
-testCmd bin dir file smt (ExtraOptions (GhcSuitableOpts (LO ghcOpts)) (LiquidOnlyOpts (LO liquidOnlyOpts)))
+testCmd _bin dir file _smt (ExtraOptions (GhcSuitableOpts (LO ghcOpts)) (LiquidOnlyOpts (LO liquidOnlyOpts)))
 #ifdef USE_NEW_EXECUTABLE
-  = printf "%s -i. -i%s %s %s %s" bin dir ghcOpts liquidOpts (dir </> file)
+  = printf "ghc -fplugin=LiquidHaskell -i. -i%s -fno-code --make %s %s %s" {- bin -} dir ghcOpts liquidOpts (dir </> file)
   where
-    liquidOpts = ("--smtsolver=" ++ show smt) <> " " <> liquidOnlyOpts
+    liquidOpts = ("--smtsolver=" ++ show _smt) <> " " <> liquidOnlyOpts
 #else
   = printf "cd %s && ghc -fplugin=LiquidHaskell -fno-code --make -i . %s %s" dir {- bin -} {- (show smt) -} file (ghcOpts <> " " <> liquidOnlyOpts)
 #endif
