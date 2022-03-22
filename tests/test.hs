@@ -783,7 +783,7 @@ testCmd bin dir file smt (ExtraOptions (GhcSuitableOpts (LO ghcOpts)) (LiquidOnl
   where
     liquidOpts = ("--smtsolver=" ++ show smt) <> " " <> liquidOnlyOpts
 #else
-  = printf "cd %s && %s -i . --smtsolver %s %s %s" dir bin (show smt) file (ghcOpts <> " " <> liquidOnlyOpts)
+  = printf "cd %s && ghc -fplugin=LiquidHaskell -fno-code --make -i . %s %s" dir {- bin -} {- (show smt) -} file (ghcOpts <> " " <> liquidOnlyOpts)
 #endif
 
 ignoreLists :: [FilePath]
