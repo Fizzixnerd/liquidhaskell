@@ -1,4 +1,4 @@
-module StateLib 
+module StateLib where
   ( returnST -- :: a -> ST a s
   , bindST   -- :: ST a s -> (a -> ST b s) -> ST b s
   , ST(..)

@@ -1,6 +1,6 @@
 {-@ LIQUID "--exact-data-cons"   @-}
 {-@ LIQUID "--ple" @-}
-module Foo where
+module LF326 where
 import Prelude hiding (Maybe (..))
 
 -- Heap Parital Order:

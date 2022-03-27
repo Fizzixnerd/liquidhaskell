@@ -6,7 +6,7 @@
 
 {-# LANGUAGE ExistentialQuantification, KindSignatures, TypeFamilies, GADTs #-}
 
-module BinahUpdateLib where
+module BinahUpdateLib1 where
 
 class PersistEntity record where
     data EntityField record typ :: *

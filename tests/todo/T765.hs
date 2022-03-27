@@ -2,7 +2,7 @@
 -- * nothing for 'gunk'
 -- * {v = 1} for `z`
 
-module Bar where
+module T765 where
 
 {-@ bar :: Nat -> Nat @-}
 bar :: Int -> Int 

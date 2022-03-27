@@ -1,4 +1,4 @@
-module Fixme where
+module InfiniteLists where
 
 import Prelude hiding (repeat, take, head)
 import Language.Haskell.Liquid.Prelude

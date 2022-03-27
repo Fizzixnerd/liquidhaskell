@@ -1,6 +1,6 @@
 {-@ LIQUID "--exact-data-con"                      @-}
 
-module Induction where
+module T996 where
 
 import qualified Prelude
 import           Prelude (Char, Int)

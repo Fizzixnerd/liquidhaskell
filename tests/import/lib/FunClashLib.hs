@@ -1,4 +1,4 @@
-module FunClashLib (blob) where
+module FunClashLib where
 
 import FunClashLibLib 
 

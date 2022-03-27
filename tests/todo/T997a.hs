@@ -4,7 +4,7 @@
 {-@ LIQUID "--ple" @-}
 {-@ LIQUID "--diff"                                @-}
 
-module Lists where
+module T997a where
 
 import Language.Haskell.Liquid.ProofCombinators
 

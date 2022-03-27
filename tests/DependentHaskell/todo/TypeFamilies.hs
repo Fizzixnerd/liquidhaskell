@@ -28,7 +28,7 @@
 --       junk symbol in the measure for headerEth
 {-@ LIQUID "--prune-unsorted" @-}
 
-module ProxyClass where
+module TypeFamilies where
 
 import           Data.Proxy
 import           GHC.TypeLits (Nat)

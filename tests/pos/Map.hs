@@ -1,4 +1,4 @@
-module Map (error, mllen) where
+module Map where
 
 import Language.Haskell.Liquid.Prelude
 

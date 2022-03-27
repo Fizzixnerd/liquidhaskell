@@ -1,6 +1,6 @@
 {-@ LIQUID "--typed-holes" @-}
 
-module ListZip where 
+module ListZip where
 
 import Language.Haskell.Liquid.Synthesize.Error
 

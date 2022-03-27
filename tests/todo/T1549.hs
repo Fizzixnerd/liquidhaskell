@@ -1,6 +1,6 @@
 {-# LANGUAGE RankNTypes          #-}
 
-module Foo where 
+module T1549 where
 
 {-@ LIQUID "--reflection" @-}
 

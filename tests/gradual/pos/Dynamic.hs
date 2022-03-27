@@ -1,6 +1,6 @@
 -- | Sec 5 from Gradual Refinement Types 
 
-module Interpretations where
+module Dynamic where
 {-@ LIQUID "--gradual" @-}
 {-@ LIQUID "--eliminate=none" @-}
 

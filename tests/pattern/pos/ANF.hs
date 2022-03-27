@@ -1,6 +1,6 @@
 {-@ LIQUID "--no-termination"    @-}
 
-module ANF (Op (..), Expr (..), isImm, isAnf, anf) where
+module ANF where
 
 import Control.Monad.Trans.State.Lazy
 

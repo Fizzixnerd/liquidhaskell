@@ -1,4 +1,4 @@
-module SafePartialFunctions (gotail, gohead) where
+module SafePartialFunctions where
 
 import Prelude hiding (fromJust, tail, head)
 

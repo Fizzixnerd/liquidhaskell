@@ -2,7 +2,7 @@
 
 {-@ LIQUID "--no-termination" @-}
 
-module LinSpace () where
+module NameClash where
 
 
 data PVector = PVector [Integer] [Integer] (Space PVector) -- { 

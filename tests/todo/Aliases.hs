@@ -1,4 +1,4 @@
-module Foo where
+module Aliases where
 
 {-@ type Foos = [Foo] @-}
 

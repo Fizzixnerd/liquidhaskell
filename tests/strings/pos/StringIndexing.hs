@@ -11,7 +11,7 @@
 {-@ LIQUID "--totality"            @-}
 {-@ LIQUID "--exactdc"             @-}
 
-module Main where
+module StringIndexing where
 
 import Prelude hiding ( mempty, mappend, id, mconcat, map
                       , take, drop  

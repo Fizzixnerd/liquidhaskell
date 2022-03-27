@@ -1,4 +1,4 @@
-module SClass where
+module NoInstance where
 
 import qualified Data.Set
 

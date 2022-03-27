@@ -1,6 +1,6 @@
 -- TAG: abref 
 
-module GhcSort (qsort) where
+module RecQSort where
 
 {-@ type OList a =  [a]<{\fld v -> (v >= fld)}>  @-}
 

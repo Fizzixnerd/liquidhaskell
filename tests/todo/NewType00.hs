@@ -1,4 +1,4 @@
-module NT where
+module NewType00 where
 
 {- newtype Natural = Natural { toInt :: Nat } @-}
 newtype Natural = Natural { toInt :: Int }

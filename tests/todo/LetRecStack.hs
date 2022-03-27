@@ -19,7 +19,7 @@
 
 {-@ LIQUID "--no-termination" @-}
 
-module Foo (foo) where
+module LetRecStack where
 
 die :: String -> a
 die = error

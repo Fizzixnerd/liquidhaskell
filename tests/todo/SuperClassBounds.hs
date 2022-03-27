@@ -1,4 +1,4 @@
-module Compose where
+module SuperClassBounds where
 
 import Prelude hiding (Functor, Monad)
 

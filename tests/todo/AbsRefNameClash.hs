@@ -15,7 +15,7 @@
 
 {-@ LIQUID "--no-termination" @-}
 
-module WBL where 
+module AbsRefNameClash where
 
 type Priority = Int
 

@@ -1,4 +1,4 @@
-module AVLTree where 
+module AVLTree where
 
 -- from: https://gist.github.com/gerard/109729
 

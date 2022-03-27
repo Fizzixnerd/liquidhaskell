@@ -1,4 +1,4 @@
-module Fixme where
+module CatMaybes where
 
 
 import qualified Data.Set

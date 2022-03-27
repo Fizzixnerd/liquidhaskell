@@ -3,7 +3,7 @@
 {-@ LIQUID "--exact-data-cons" @-}
 {-@ LIQUID "--higherorderqs"   @-}
 
-module Peano where
+module ReflImp where
 
 import ProofCombinators
 

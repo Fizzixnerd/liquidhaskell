@@ -1,4 +1,4 @@
-module MovieClient where
+module DBMovies0 where
 
 
 data Tag 

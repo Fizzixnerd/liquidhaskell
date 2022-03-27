@@ -2,7 +2,7 @@
 
 {-@ LIQUID "--reflection"     @-}
 
-module Nat where
+module NatClass where
 
 import Language.Haskell.Liquid.ProofCombinators
 

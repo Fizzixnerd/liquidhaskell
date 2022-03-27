@@ -1,4 +1,4 @@
-module Chunks where
+module SMTDiverge where
 
 {-@ go :: Nat -> {v:Int | 1 < v} -> () @-}
 go :: Int -> Int -> ()

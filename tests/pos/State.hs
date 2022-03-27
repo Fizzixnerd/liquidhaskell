@@ -1,4 +1,4 @@
-module State () where
+module State where
 
 import StateLib
 

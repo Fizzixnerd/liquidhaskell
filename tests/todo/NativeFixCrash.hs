@@ -1,4 +1,4 @@
-module Interpreter where 
+module NativeFixCrash where
 
 data Instr = I
 

@@ -1,4 +1,4 @@
-module Blank where
+module LocalRecursiveFuns where
 
 data Tree a = Tip | Node a (Tree a) (Tree a)
 

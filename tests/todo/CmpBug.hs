@@ -1,4 +1,4 @@
-module Fixme where
+module CmpBug where
 
 zipWith :: (Char -> Char -> a) -> b -> b -> [a]
 zipWith f = zipWith' ((. w2c) . f . w2c)

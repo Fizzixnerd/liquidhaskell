@@ -1,4 +1,4 @@
-module Isort () where
+module InvBug where
 
 data F = F 
 

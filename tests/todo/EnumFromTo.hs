@@ -1,4 +1,4 @@
-module Foo where
+module EnumFromTo where
 
 new :: l -> [i] -> [sd] -> ([i], [(Int, sd)])
 new l wids m | not (null wids) && length m <= length wids && not (null m)

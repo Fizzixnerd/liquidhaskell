@@ -1,4 +1,4 @@
-module ImportedReflect where
+module ImportReflected where
 
 import B 
 

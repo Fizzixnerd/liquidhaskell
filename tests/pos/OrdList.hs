@@ -1,6 +1,6 @@
 {-@ LIQUID "--pruneunsorted" @-}
 
-module OrdList (
+module OrdList where
     OrdList,
         nilOL, isNilOL, unitOL, appOL, consOL, snocOL, concatOL, concatOL',
         mapOL, fromOL, toOL, foldrOL, foldlOL, llen, ollen

@@ -1,4 +1,4 @@
-module LibRed where 
+module LibRed where
 
 data Thing = ThingRed Int 
 

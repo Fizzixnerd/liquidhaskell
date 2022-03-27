@@ -1,4 +1,4 @@
-module Goo where 
+module T777 where
 
 {-@ instance measure glub @-}
 glub :: [Int] -> Bool

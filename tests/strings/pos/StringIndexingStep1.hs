@@ -7,7 +7,7 @@
 {-@ LIQUID "--totality"        @-}
 {-@ LIQUID "--stringtheory"    @-}
 
-module StringIndexing where
+module StringIndexingStep1 where
 
 
 import GHC.TypeLits

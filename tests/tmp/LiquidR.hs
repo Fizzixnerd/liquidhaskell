@@ -15,7 +15,7 @@
       FunctionalDependencies
  #-}
 
-module LiquidR
+module LiquidR where
   (array,
    combine,
    and,

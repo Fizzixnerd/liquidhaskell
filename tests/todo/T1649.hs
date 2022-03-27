@@ -7,7 +7,7 @@
 {- LIQUID "--no-adt"         @-} 
 {-@ LIQUID "--ple-local"      @-} 
 
-module Properties where 
+module T1649 where
 
 
 {-@ assume injectiveEqRTFun :: x:(a->b) -> y:(a->b) -> d:{EqRT (a->b) {x} {y} | isEqFun d} 

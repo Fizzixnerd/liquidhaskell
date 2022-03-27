@@ -1,6 +1,6 @@
 -- TODO-REBARE: should be UNSAFE, but is currently NOT 
 
-module LiquidClass where
+module Inst01_UNSAFE where
 
 
 -- | Typing classes

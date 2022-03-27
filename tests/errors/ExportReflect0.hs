@@ -3,7 +3,7 @@
 {-@ LIQUID "--exactdc"     @-}
 {-@ LIQUID "--higherorder" @-}
 
-module Bug (foo, zogbert) where
+module ExportReflect0 where
 
 import Language.Haskell.Liquid.ProofCombinators
 

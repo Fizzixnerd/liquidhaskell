@@ -1,4 +1,4 @@
-module Blank where
+module ClassMeasureOK where
 
 {-@ class measure spl :: forall a. a -> Int @-}
 

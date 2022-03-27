@@ -1,4 +1,4 @@
-module Foo where
+module LocalSpec1 where
 
 {-@ filterElts :: forall <p :: a -> Prop>. Eq a => [a<p>] -> [a] -> [a<p>] @-}
 filterElts :: Eq a => [a] -> [a] -> [a]

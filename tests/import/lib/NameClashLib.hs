@@ -1,4 +1,4 @@
-module NameClashLib where 
+module NameClashLib where
 
 data Foo = FooLib Int 
 

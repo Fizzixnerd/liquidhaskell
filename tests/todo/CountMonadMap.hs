@@ -1,7 +1,7 @@
 {-@ LIQUID "--no-pattern-inline" @-}
 {-@ LIQUID "--higherorder"       @-}
 
-module Count (sz) where
+module CountMonadMap where
 
 import Prelude hiding (map)
 

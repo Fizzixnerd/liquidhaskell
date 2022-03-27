@@ -1,4 +1,4 @@
-module ReExport ( module ReExport
+module ReExport where
   , module X
   ) where
 

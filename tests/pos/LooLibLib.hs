@@ -1,4 +1,4 @@
-module LooLibLib (plusOne) where
+module LooLibLib where
 
 {-@ plusOne :: x:Int -> {v:Int| v = x + 1 } @-}
 plusOne :: Int -> Int

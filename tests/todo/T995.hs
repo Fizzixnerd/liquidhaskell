@@ -1,7 +1,7 @@
 {-@ LIQUID "--exact-data-con" @-}
 {-@ LIQUID "--ple" @-}
 
-module Basics
+module T995 where
   ( Peano(..)
   , toNat
   ) where

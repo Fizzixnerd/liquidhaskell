@@ -1,4 +1,4 @@
-module Fixme where
+module SelfRefPredicates where
 
 {-@ bindST :: forall <p :: s -> Prop, q :: s -> a -> s -> Prop, r :: s -> b -> s -> Prop>.
             (xm:s<p> -> (a, s)<q xm>) 

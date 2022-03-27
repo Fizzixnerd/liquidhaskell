@@ -6,7 +6,7 @@
 {-@ LIQUID "--higherorder"    @-}
 {-@ LIQUID "--ple"            @-}
 
-module Ev where
+module T1189 where
 
 data Peano where
   Z :: Peano

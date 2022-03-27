@@ -1,6 +1,6 @@
 {-@ LIQUID "--short-names"    @-}
 
-module InlineMeasures where
+module InlineMeasure where
 
 {-@ measure mmax @-}
 mmax       :: (Int, Int) -> Int

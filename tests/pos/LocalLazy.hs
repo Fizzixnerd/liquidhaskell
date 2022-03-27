@@ -1,4 +1,4 @@
-module LocalLazy (bar) where
+module LocalLazy where
 
 import Language.Haskell.Liquid.Prelude
 

@@ -1,6 +1,6 @@
 {-@ LIQUID "--pruneunsorted" @-}
 
-module ResolvePred (myFold, llen) where
+module ResolvePred where
 
 {-@ data L [llen] = C (h :: Int) (t :: L) | N @-}
 

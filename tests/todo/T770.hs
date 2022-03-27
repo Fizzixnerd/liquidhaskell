@@ -24,7 +24,7 @@ if we UNCOMMENT import (2) then we get no errors
 
 -}
 
-module Wrenn where
+module T770 where
 
 import Prelude ()
 

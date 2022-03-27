@@ -1,4 +1,4 @@
-module ListSort (insertSort, insertSort', mergeSort, quickSort) where
+module ListSort where
 
 
 {-@ type OList a    = [a]<{\fld v -> (v >= fld)}> @-}

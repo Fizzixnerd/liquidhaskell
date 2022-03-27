@@ -3,7 +3,7 @@
 {-@ LIQUID "--exactdc"             @-}
 
 
-module DivideAndQunquer where 
+module DivideAndQunquer where
 
 import Prelude hiding (mconcat, map, split, take, drop)
 import Language.Haskell.Liquid.ProofCombinators 

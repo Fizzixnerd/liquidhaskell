@@ -2,7 +2,7 @@
 
 {-# LANGUAGE  GADTs #-}
 
-module Query where
+module ExactGADT6 where
 
 data Field typ where
   FldX :: Int -> Field Int

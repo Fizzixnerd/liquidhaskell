@@ -5,7 +5,7 @@
 {-@ LIQUID "--autoproofs"      @-}
 {-@ LIQUID "--totality"        @-}
 {-@ LIQUID "--exact-data-cons" @-}
-module Append where
+module TypeError where
 
 import Axiomatize
 import Equational

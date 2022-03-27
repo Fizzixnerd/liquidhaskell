@@ -1,4 +1,4 @@
-module WrapLib ( module WrapLibCode ) where 
+module WrapLib where
 
 import WrapLibCode
 

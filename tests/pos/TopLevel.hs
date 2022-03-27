@@ -1,4 +1,4 @@
-module TopLevel (bar) where
+module TopLevel where
 
 import Language.Haskell.Liquid.Prelude
 

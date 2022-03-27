@@ -2,7 +2,7 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE KindSignatures #-}
 
-module Foo where
+module TypeSynonyms where
 import GHC.TypeLits
 
 {-@ foo :: x:Int -> {v:Int | v > x } @-}

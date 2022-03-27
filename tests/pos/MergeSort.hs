@@ -4,7 +4,7 @@
 --   2. The output is indeed in non-decreasing order 
 ------------------------------------------------------------------------------
 
-module MergeSort (sort) where
+module MergeSort where
 
 {-@ type OList a    = [a]<{\fld v -> (v >= fld)}> @-}
 

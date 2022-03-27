@@ -1,4 +1,4 @@
-module HOSubtype where
+module SubType where
 
 {-@ foo :: f:(x:{v:Int | false} -> {v:Int | v = x}) -> () @-}
 foo    :: (Int -> Int) -> ()

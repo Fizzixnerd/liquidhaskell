@@ -1,4 +1,4 @@
-module Blank where
+module ClassMeasureIdeal where
 
 class Bob a where
   {-@ measure spl @-}

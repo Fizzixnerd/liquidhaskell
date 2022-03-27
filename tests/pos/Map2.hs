@@ -1,4 +1,4 @@
-module Map (singleton, insert, delete, mllen) where
+module Map2 where
 
 import Language.Haskell.Liquid.Prelude
 

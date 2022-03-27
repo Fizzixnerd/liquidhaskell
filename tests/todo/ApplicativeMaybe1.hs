@@ -6,7 +6,7 @@
 
 {-# LANGUAGE IncoherentInstances   #-}
 {-# LANGUAGE FlexibleContexts #-}
-module ListFunctors where
+module ApplicativeMaybe1 where
 
 import MaybeReflect1
 import Prelude hiding (Maybe(..))

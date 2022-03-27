@@ -1,4 +1,4 @@
-module Trees where
+module TreeMap where
 
 {- LIQUID "--no-termination" @-}
 

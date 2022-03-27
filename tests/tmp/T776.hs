@@ -15,7 +15,7 @@
 
 {-@ LIQUID "--prune-unsorted" @-}
 
-module LiquidR where
+module T776 where
 
 {-@ measure size @-}
 size        :: [a] -> Int

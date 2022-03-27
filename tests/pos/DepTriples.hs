@@ -1,4 +1,4 @@
-module DependentTriples  where
+module DepTriples where
 
 {-@ LIQUID "--savequery" @-}
 

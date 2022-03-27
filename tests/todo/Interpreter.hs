@@ -1,4 +1,4 @@
-module Interpreter where 
+module Interpreter where
 {-@ LIQUID "--totality" @-}
 data BinOp a = Plus | Times
 

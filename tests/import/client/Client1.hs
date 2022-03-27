@@ -1,4 +1,4 @@
-module Client1 where 
+module Client1 where
 
     import Client2
     

@@ -1,4 +1,4 @@
-module EffSTT (
+module EffSTT where
 
   -- * Basic STT type and instances
     STT

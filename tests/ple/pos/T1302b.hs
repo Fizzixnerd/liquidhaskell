@@ -9,7 +9,7 @@
 {-@ LIQUID "--no-totality"    @-}
 {-@ LIQUID "--ple"            @-} 
 
-module Field where
+module T1302b where
 
 import Prelude hiding (sequence, mapM, filter)
 -- import qualified Data.Set as Set

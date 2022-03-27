@@ -1,6 +1,6 @@
 -- | Trivial test for effects
 
-module Eff0 (test0, test1) where
+module Eff1 where
 
 import EffSTT
 

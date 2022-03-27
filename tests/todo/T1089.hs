@@ -6,7 +6,7 @@
 
 {-# LANGUAGE ExistentialQuantification, KindSignatures, TypeFamilies, GADTs #-}
 
-module Query where
+module T1089 where
 
 import Prelude hiding (filter)
 

@@ -1,4 +1,4 @@
-module InfixLib where 
+module InfixLib where
 
 {-@ infix +++ @-}
 {-@ reflect +++ @-}

@@ -1,4 +1,4 @@
-module Interpreter where 
+module FixCrash where
 
 {- The following code crashes fixpoint see issue 
 https://github.com/ucsd-progsys/liquid-fixpoint/issues/77

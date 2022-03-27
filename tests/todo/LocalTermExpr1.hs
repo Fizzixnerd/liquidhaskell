@@ -1,4 +1,4 @@
-module LocalTermExpr where
+module LocalTermExpr1 where
 
 {-@ assume (!!) :: xs:[a] -> {v:Nat | v < len xs} -> a @-}
 

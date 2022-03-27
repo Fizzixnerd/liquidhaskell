@@ -1,4 +1,4 @@
-module Rec where
+module Recursion where
 
 import Language.Haskell.Liquid.Prelude
 

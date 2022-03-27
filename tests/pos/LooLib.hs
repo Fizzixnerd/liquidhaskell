@@ -1,4 +1,4 @@
-module LooLib ( module LooLibLib , plusTwo ) where
+module LooLib where
 
 import LooLibLib 
 

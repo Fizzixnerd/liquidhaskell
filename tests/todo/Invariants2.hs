@@ -1,4 +1,4 @@
-module Invariants where
+module Invariants2 where
 
 {-@ measure sum :: [Int] -> Nat
     sum()     = 0

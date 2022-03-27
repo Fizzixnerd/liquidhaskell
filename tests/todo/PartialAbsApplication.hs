@@ -1,4 +1,4 @@
-module Fixme where
+module PartialAbsApplication where
 
 data World = W Int
 {-@ data FIO a <pre :: World -> Prop, post :: World -> a -> World -> Prop>

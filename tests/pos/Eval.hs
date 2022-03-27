@@ -1,7 +1,7 @@
 {-@ LIQUID "--no-termination" @-}
 {-@ LIQUID "--prune-unsorted" @-}
 
-module Eval (eval) where
+module Eval where
 
 import Language.Haskell.Liquid.Prelude (liquidError)
 import Prelude hiding (lookup)

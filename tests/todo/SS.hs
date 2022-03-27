@@ -11,7 +11,7 @@
 -- Portability :  portable, Haskell 98
 --
 
-module XMonad.StackSet where
+module SS where
 
 import Prelude hiding (filter, reverse, (++), elem) -- LIQUID
 import Data.Maybe   (listToMaybe,isJust,fromMaybe)

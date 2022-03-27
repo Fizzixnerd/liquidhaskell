@@ -1,6 +1,6 @@
 -- SHOULD BE SAFE; disabled due to TODO-REBARE-CLASS 
 
-module Data.Monoid where
+module VerifiedMonoid_POS where
 
 {-@ LIQUID "--reflection" @-}
 

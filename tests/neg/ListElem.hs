@@ -1,4 +1,4 @@
-module ListElem (listElem) where
+module ListElem where
 
 import Data.Set
 

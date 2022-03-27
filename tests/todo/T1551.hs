@@ -1,6 +1,6 @@
 {-@ LIQUID "--reflection" @-}
 
-module FunId where
+module T1551 where
 
 
 {-@ funIdUnsafe :: g:(a -> b) -> { f:(a -> b) |  f == g } @-}

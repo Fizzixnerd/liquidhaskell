@@ -2,7 +2,7 @@
 
 -- | Typing class-instances  
 
-module LiquidClass where
+module Inst00 where
 
 -- | Step 1: Refine type dictionaries:
 

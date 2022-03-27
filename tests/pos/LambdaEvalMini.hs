@@ -1,7 +1,7 @@
 {-@ LIQUID "--no-termination" @-}
 {-@ LIQUID "--no-totality" @-}
 
-module LambdaEvalMini () where
+module LambdaEvalMini where
 
 import Language.Haskell.Liquid.Prelude
 

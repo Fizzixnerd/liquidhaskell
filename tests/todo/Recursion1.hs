@@ -1,4 +1,4 @@
-module Rec1 where
+module Recursion1 where
 
 import Control.Monad.ST 
 import Data.IORef 

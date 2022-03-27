@@ -1,6 +1,6 @@
 {-# LANGUAGE MultiParamTypeClasses, FlexibleInstances #-}
 
-module LiquidR where
+module T772 where
 
 class R m where
 

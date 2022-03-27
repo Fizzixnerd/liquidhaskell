@@ -1,4 +1,4 @@
-module When (foo, fooOk) where
+module When where
 
 {-@ assume div :: x:_ -> y:{_ | y /= 0} -> _ @-}
 

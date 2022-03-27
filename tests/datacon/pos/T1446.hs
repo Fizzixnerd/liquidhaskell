@@ -3,7 +3,7 @@
 {-@ LIQUID "--no-adt"     @-}
 {-@ LIQUID "--reflection" @-}
 
-module Model where
+module T1446 where
 
 data BlobId = BlobId 
 

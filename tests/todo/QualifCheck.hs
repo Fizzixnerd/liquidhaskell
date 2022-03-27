@@ -1,4 +1,4 @@
-module Foo where
+module QualifCheck where
 
 {-@ qualif Foo(v:a, x:List a) : (Set_mem v (listElts xs)) @-}
 

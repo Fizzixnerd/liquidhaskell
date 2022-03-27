@@ -1,5 +1,5 @@
 
-module FunClashLibLib where 
+module FunClashLibLib where
  
 {-@ incr :: Nat -> Nat @-} 
 incr :: Int -> Int 

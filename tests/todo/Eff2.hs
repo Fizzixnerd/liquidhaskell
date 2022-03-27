@@ -1,6 +1,6 @@
 -- | Trivial test for effects
 
-module Eff0 (test0, test1) where
+module Eff2 where
 
 import Data.IORef
 

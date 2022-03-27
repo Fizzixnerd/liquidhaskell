@@ -1,4 +1,4 @@
-module Class1 where 
+module Class1 where
 
 data Dict a = D { meth :: a -> Int -> Int }
 

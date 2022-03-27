@@ -19,7 +19,7 @@ NV TODO
 {-@ LIQUID "--totality"            @-}
 {-@ LIQUID "--exactdc"             @-}
 
-module Main where
+module StringIndexingStep3 where
 
 import Language.Haskell.Liquid.String
 import GHC.TypeLits

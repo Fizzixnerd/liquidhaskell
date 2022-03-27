@@ -5,7 +5,7 @@
 {-# LANGUAGE FlexibleInstances    #-}
 {-# LANGUAGE QuasiQuotes          #-}
 
-module LiquidR
+module LiquidR2 where
   ( array
   , combine
   , indexNullary

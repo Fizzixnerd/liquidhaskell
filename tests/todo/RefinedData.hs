@@ -1,4 +1,4 @@
-module Foo where
+module RefinedData where
 
 data F = F {f1 :: Int, f2 :: Bool}
 

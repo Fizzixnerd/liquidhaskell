@@ -1,6 +1,6 @@
 {-@ LIQUID "--ple" @-}
 
-module Blank where
+module ClassReflect where
 
 class Bob a where
   {-@ reflect spl @-}

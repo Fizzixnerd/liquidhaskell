@@ -1,4 +1,4 @@
-module Class2 where 
+module Class2 where
 
 class Dict a where 
   meth :: a -> Int -> Int 

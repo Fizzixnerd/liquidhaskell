@@ -2,7 +2,7 @@
 {-@ LIQUID "--totality"          @-}
 {-@ LIQUID "--exactdc"           @-}
 
-module BoyerMoore where
+module Boyer_Moore where
 
 import Prelude hiding 
   (foldl, map, fst, snd, scanl, filter, length, compose, endsWith, inits, reverse, take, 

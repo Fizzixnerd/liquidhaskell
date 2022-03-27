@@ -1,5 +1,5 @@
 {-@ LIQUID "--reflection" @-}
-module Braun where 
+module Braun where
 
 import qualified Data.Set as S 
 
@@ -95,7 +95,7 @@ tElts' (Node _ l r) = (tElts l) `S.union` (tElts r)
 
 {- 
 
-module BraunHeaps
+module Braun where
 
   use int.Int
   use bintree.Tree

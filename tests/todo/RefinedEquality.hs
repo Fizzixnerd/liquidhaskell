@@ -8,7 +8,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module RefinedEquality
+module RefinedEquality where
 --   ( EqT(..), BEq(..)
 -- --   , eqRTCtx
 -- --   , eqFun

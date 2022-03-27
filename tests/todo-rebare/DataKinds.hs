@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 
-module ProxyClass where
+module DataKinds where
 
 import           Data.Proxy
 

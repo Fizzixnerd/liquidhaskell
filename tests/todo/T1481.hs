@@ -1,6 +1,6 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 
-module Foo where 
+module T1481 where
 
 {-@ class Monad m => Filter filter m where
       q  :: forall m. Int -> Int -> Int -> _

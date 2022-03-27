@@ -1,4 +1,4 @@
-module Invariant where
+module Invariants where
 
 data F a = F {fx :: a, fy :: a, fzz :: a} 
          | G {fx :: a, fy :: a}

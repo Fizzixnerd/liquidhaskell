@@ -1,4 +1,4 @@
-module Fixme where
+module NotesOnProductivityTest where
 
 import Prelude hiding (repeat, filter)
 

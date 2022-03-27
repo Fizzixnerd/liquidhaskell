@@ -1,6 +1,6 @@
 {-@ LIQUID "--prune-unsorted" @-}
 
-module Graph () where
+module Graph where
 
 import Data.Set
 

@@ -1,6 +1,6 @@
 {-@ LIQUID "--no-termination" @-}
 
-module LiquidArrayNullTerm () where
+module LiquidArrayNullTerm where
 
 import Language.Haskell.Liquid.Prelude
 

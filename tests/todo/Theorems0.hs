@@ -5,7 +5,7 @@
 {-# LANGUAGE TypeOperators       #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Theorems where
+module Theorems0 where
 
 import Equational 
 

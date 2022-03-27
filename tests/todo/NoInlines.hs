@@ -1,4 +1,4 @@
-module Foo where
+module NoInlines where
 
 foo :: IO ()
 foo =

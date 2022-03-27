@@ -1,6 +1,6 @@
 {-# LANGUAGE TupleSections #-}
 
-module Main where
+module Synthesis where
 
 import           Test.Tasty 
 import           Test.Tasty.HUnit

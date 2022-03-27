@@ -1,4 +1,4 @@
-module Invariant where
+module IntInvariants where
 
 
 {-@ invariant {v : Int | v > 0 } @-}

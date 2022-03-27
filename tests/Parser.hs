@@ -11,7 +11,7 @@
 --
 --  $ stack test :liquidhaskell-parser
 
-module Main where
+module Parser where
 
 import           Control.Monad (filterM, unless)
 import           Data.Data

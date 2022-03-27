@@ -1,6 +1,6 @@
 {-@ LIQUID "--no-positivity-check" @-}
 {-# LANGUAGE GADTs #-}
-module Positivity where 
+module PositivityCases where
 
 {-
 Occurrence            | Coq | LH  | unsound* 

@@ -4,7 +4,7 @@
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE RankNTypes     #-}
 
-module Iso where
+module T1089b where
 
 import Language.Haskell.Liquid.ProofCombinators
 

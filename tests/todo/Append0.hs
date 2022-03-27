@@ -1,4 +1,4 @@
-module Reverse where
+module Append0 where
 
 {-@ LIQUID "--no-termination" @-}
 

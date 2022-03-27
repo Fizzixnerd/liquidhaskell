@@ -1,4 +1,4 @@
-module Foo where
+module Invariants1 where
 
 {-@ invariant {v:[Nat] | (sum v) >= 0} @-}
 

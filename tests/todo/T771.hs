@@ -12,7 +12,7 @@ binders on typeclass constraints.
 
 -}
 
-module Wrenn where
+module T771 where
 
 {-@ incr :: thing:(Num a) => a -> {v:a | v = thing} @-}
 

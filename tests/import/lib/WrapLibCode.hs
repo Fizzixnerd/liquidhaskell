@@ -1,4 +1,4 @@
-module WrapLibCode (foo) where
+module WrapLibCode where
 
 foo :: Int -> Int 
 foo x = x + 1

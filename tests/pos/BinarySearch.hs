@@ -2,7 +2,7 @@
      http://www.haskellforall.com/2015/12/compile-time-memory-safety-using-liquid.html
 -}
 
-module BinarySearch (binarySearch) where
+module BinarySearch where
 
 import Data.Vector as V
 

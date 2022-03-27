@@ -1,4 +1,4 @@
-module Box (Box, get, put, emp) where
+module Box where
 
 import Data.Dynamic
 

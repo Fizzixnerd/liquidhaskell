@@ -1,6 +1,6 @@
 {- Example of AVL trees by michaelbeaumont -}
 
-module AVL (Tree, singleton, insert, ht, bFac) where
+module AVL where
 
 -- Basic functions
 {-@ data Tree [ht] @-} 

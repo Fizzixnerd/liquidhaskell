@@ -19,7 +19,7 @@
 
 
 --------------------------------------------------------------------------------
-module Models where
+module TypeEquality01 where
 
 class PersistEntity record where
     data EntityField record :: * -> *
