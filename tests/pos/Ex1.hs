@@ -2,7 +2,7 @@
 
 -- | A somewhat fancier example demonstrating the use of Abstract Predicates and exist-types
 
-module Ex1 where
+module Ex1 (llen) where
 
 -------------------------------------------------------------------------
 -- | Data types ---------------------------------------------------------
@@ -37,8 +37,8 @@ sizeOf (Cons _ xs) = 1 + sizeOf xs
 -- parameter that will let us properly describe the type of `efoldr`
 
 {-@ efoldr :: forall a b <p :: x0:Vec a -> x1:b -> Bool>.
-                (xs:Vec a -> x:a -> b <p xs> -> b <p (Ex.Cons x xs)>)
-              -> b <p Ex.Nil>
+                (xs:Vec a -> x:a -> b <p xs> -> b <p (Ex1.Cons x xs)>)
+              -> b <p Ex1.Nil>
               -> ys: Vec a
               -> b <p ys>
   @-}

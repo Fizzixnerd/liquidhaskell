@@ -1,6 +1,6 @@
 {-@ LIQUID "--no-totality" @-}
 
-module BST where
+module BST (blen) where
 
 import Language.Haskell.Liquid.Prelude
 

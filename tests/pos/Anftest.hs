@@ -1,4 +1,4 @@
-module Anftest where
+module Anftest () where
 
 -- xs :: [Int]
 -- xs = let x0 = 0

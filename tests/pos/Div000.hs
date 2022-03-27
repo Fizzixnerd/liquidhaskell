@@ -1,4 +1,4 @@
-module Div000 where
+module Div000 (bar) where
 
 {-@ mydiv :: Int -> {v:Int | v /= 0} -> Int @-}
 mydiv :: Int -> Int -> Int

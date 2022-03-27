@@ -1,4 +1,4 @@
-module DataConQuals where
+module DataConQuals () where
 
 data G = G { gx :: Int, gy :: Int }
 

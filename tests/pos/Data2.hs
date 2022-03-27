@@ -1,4 +1,4 @@
-module Data2 where
+module Data2(prop_rng1, llen) where
 
 import Control.Applicative
 import Language.Haskell.Liquid.Prelude

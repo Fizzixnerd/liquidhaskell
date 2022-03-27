@@ -1,5 +1,5 @@
 {-@ LIQUID "--no-termination" @-}
-module ComprehensionTerm where
+module ComprehensionTerm (quickSort, foo, qsort) where
 
 -- This is a blank file.
 

@@ -1,4 +1,4 @@
-module Cut00 where
+module Cut00 (foo0) where
 
 {-@ foo0 :: Nat -> Nat @-}
 

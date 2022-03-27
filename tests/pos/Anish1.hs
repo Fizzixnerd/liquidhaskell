@@ -1,4 +1,4 @@
-module Anish1 where
+module Anish1 () where
 
 inc :: Int -> Int
 inc xoooo = xoooo + 1

@@ -1,4 +1,4 @@
-module Cmptag0 where
+module Cmptag0 () where
 
 {-@ type OList a = [a]<{\fld v -> (v >= fld)}> @-}
 

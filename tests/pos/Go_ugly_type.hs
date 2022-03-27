@@ -1,3 +1,5 @@
+module Go_ugly_type where
+
 {- decrease go 2 @-}
 
 {-@ rev :: xs:[a] -> {v: [a] | len v = len xs} @-}

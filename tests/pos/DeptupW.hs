@@ -1,4 +1,4 @@
-module DeptupW where
+module DeptupW () where
 
 import Language.Haskell.Liquid.Prelude
 
