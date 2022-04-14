@@ -1,0 +1,17 @@
+packages: .
+          ../liquid-base
+          ../liquid-bytestring
+          ../liquid-containers
+          ../liquid-fixpoint
+          ../liquid-ghc-prim
+          ../liquid-parallel
+          ../liquid-prelude
+          ../liquid-vector
+          ../liquid-platform
+          ../.
+
+package liquid-fixpoint
+  flags: +devel
+
+package liquid-platform
+  flags: +devel
