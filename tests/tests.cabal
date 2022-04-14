@@ -239,6 +239,8 @@ executable benchmark-icfp15-pos
 
 executable benchmark-icfp15-neg
   main-is:            Main.hs
+  if !flag(build-negs)
+    buildable:      False
 
   hs-source-dirs:     app
                     , benchmarks/icfp15/neg
@@ -328,6 +330,8 @@ executable prover-nople-pos
 
 executable prover-nople-neg
   main-is:            Main.hs
+  if !flag(build-negs)
+    buildable:      False
 
   hs-source-dirs:     app
                     , benchmarks/popl18/nople/neg
@@ -482,6 +486,8 @@ executable benchmark-text
 
 executable errors
     main-is:          Main.hs
+    if !flag(build-negs)
+      buildable:      False
 
     other-modules:
                     -- See Groups.hs for reasons for disabling
@@ -530,8 +536,8 @@ executable errors
                     , EmptyData
                     , EmptySig
                     , ErrLocation2
-                    , ErrLocation
-                    -- , ExportMeasure0
+                    -- , ErrLocation
+                    , ExportMeasure0
                     , ExportReflect0
                     , Fractional
                     , Frog
@@ -750,6 +756,8 @@ executable class-pos
 
 executable class-neg
     main-is:          Main.hs
+    if !flag(build-negs)
+      buildable:      False
 
     other-modules:
                       Class00
@@ -812,7 +820,7 @@ executable measure-pos
                     , Ple00
                     , Ple01
                     , Ple1
-                    , Ple1Lib
+                    , Ple1Libq
                     , PruneHO
                     , RecordAccessors
                     , Using00
@@ -1734,6 +1742,8 @@ executable absref-pos
 
 executable absref-neg
     main-is:          Main.hs
+    if !flag(build-negs)
+      buildable:      False
 
     other-modules:
                       Deppair0
@@ -1972,6 +1982,9 @@ executable ple-pos
 
 executable ple-neg
     main-is:          Main.hs
+    if !flag(build-negs)
+      buildable:      False
+
 
     other-modules:
                       BinahQuery
@@ -2059,6 +2072,8 @@ executable terminate-pos
 
 executable terminate-neg
     main-is:          Main.hs
+    if !flag(build-negs)
+      buildable:      False
 
     other-modules:
                       AutoTerm
