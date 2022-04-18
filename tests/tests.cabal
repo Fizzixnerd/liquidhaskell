@@ -67,7 +67,7 @@ executable benchmark-stitch-lh
     other-modules:
                       Language.Stitch.LH.Repl
                     , Language.Stitch.LH.Check
-                    , Language.Stitch.LH.CSE
+                    -- , Language.Stitch.LH.CSE
                     , Language.Stitch.LH.Data.List
                     , Language.Stitch.LH.Data.Map
                     , Language.Stitch.LH.Eval
