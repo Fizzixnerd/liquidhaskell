@@ -15,11 +15,17 @@ flag stack
   description: Enable when building with stack to prevent tests
                from using cabal-install.
 
-flag build-negs
-  default:     False
-  description: Whether to build negative tests. Useful with stack
-               which insists on building everything which is
-               buildable on first run.
+flag build-neg
+  default:     True
+  description: Whether to build negative tests. Useful to disable with stack
+               which insists on building everything which is buildable on first
+               run.
+
+flag build-pos
+  default:     True
+  description: Whether to build positive tests. Useful to disable with stack
+               which insists on building everything which is buildable on first
+               run.
 
 executable test-driver
     if flag(stack)
@@ -51,6 +57,8 @@ executable test-driver
 
 executable benchmark-stitch-lh
     main-is:          Main.hs
+    if !flag(build-pos)
+      buildable:      False
     build-depends:    ansi-wl-pprint >= 0.6.7.1
                     , mtl >= 2.2.1
                     , transformers >= 0.4.0.0
@@ -101,6 +109,10 @@ executable benchmark-stitch-lh
 executable benchmark-bytestring
   main-is:            Main.hs
 
+  if !flag(build-pos)
+    buildable:      False
+
+
   hs-source-dirs:     app
                     , benchmarks/bytestring-0.9.2.1
 
@@ -126,6 +138,10 @@ executable benchmark-bytestring
 
 executable benchmark-vector-algorithms
   main-is:            Main.hs
+
+  if !flag(build-pos)
+    buildable:        False
+
 
   hs-source-dirs:     app
                     , benchmarks/vector-algorithms-0.5.4.2
@@ -155,6 +171,9 @@ executable benchmark-vector-algorithms
 executable benchmark-cse230
   main-is:            Main.hs
 
+  if !flag(build-pos)
+    buildable:        False
+
   hs-source-dirs:     app
                     , benchmarks/cse230/src/Week10
 
@@ -177,6 +196,8 @@ executable benchmark-cse230
 
 executable benchmark-esop2013
   main-is:            Main.hs
+  if !flag(build-pos)
+    buildable:        False
 
   hs-source-dirs:     app
                     , benchmarks/esop2013-submission
@@ -200,6 +221,8 @@ executable benchmark-esop2013
 
 executable benchmark-icfp15-pos
   main-is:            Main.hs
+  if !flag(build-pos)
+    buildable:        False
 
   hs-source-dirs:     app
                     , benchmarks/icfp15/pos
@@ -238,7 +261,7 @@ executable benchmark-icfp15-pos
 
 executable benchmark-icfp15-neg
   main-is:            Main.hs
-  if !flag(build-negs)
+  if !flag(build-neg)
     buildable:      False
 
   hs-source-dirs:     app
@@ -263,6 +286,8 @@ executable benchmark-icfp15-neg
 
 executable prover-foundations
   main-is:            Main.hs
+  if !flag(build-pos)
+    buildable:        False
 
   hs-source-dirs:     app
                     , benchmarks/sf
@@ -281,6 +306,8 @@ executable prover-foundations
 
 executable prover-nople-pos
   main-is:            Main.hs
+  if !flag(build-pos)
+    buildable:        False
 
   hs-source-dirs:     app
                     , benchmarks/popl18/nople/pos
@@ -329,8 +356,8 @@ executable prover-nople-pos
 
 executable prover-nople-neg
   main-is:            Main.hs
-  if !flag(build-negs)
-    buildable:      False
+  if !flag(build-neg)
+    buildable:        False
 
   hs-source-dirs:     app
                     , benchmarks/popl18/nople/neg
@@ -362,6 +389,8 @@ executable prover-nople-neg
 
 executable prover-ple-pos
   main-is:            Main.hs
+  if !flag(build-pos)
+    buildable:        False
 
   hs-source-dirs:     app
                     , benchmarks/popl18/ple/pos
@@ -485,7 +514,7 @@ executable benchmark-text
 
 executable errors
     main-is:          Main.hs
-    if !flag(build-negs)
+    if !flag(build-neg)
       buildable:      False
 
     other-modules:
@@ -611,6 +640,8 @@ executable errors
 
 executable parser-pos
     main-is:          Main.hs
+    if !flag(build-pos)
+      buildable:      False
 
     other-modules:
                       NestedTuples
@@ -639,6 +670,8 @@ executable parser-pos
 
 executable names-pos
     main-is:          Main.hs
+    if !flag(build-pos)
+      buildable:      False
 
     other-modules:
                       Alias00
@@ -685,7 +718,7 @@ executable names-pos
 
 executable names-neg
     main-is:          Main.hs
-    if !flag(build-negs)
+    if !flag(build-neg)
       buildable:      False
 
     other-modules:
@@ -714,6 +747,8 @@ executable names-neg
 
 executable reflect-pos
     main-is:          Main.hs
+    if !flag(build-pos)
+      buildable:      False
 
     other-modules:
                       DoubleLit
@@ -732,6 +767,8 @@ executable reflect-pos
 
 executable class-pos
     main-is:          Main.hs
+    if !flag(build-pos)
+      buildable:      False
 
     other-modules:
                       RealProps0
@@ -755,7 +792,7 @@ executable class-pos
 
 executable class-neg
     main-is:          Main.hs
-    if !flag(build-negs)
+    if !flag(build-neg)
       buildable:      False
 
     other-modules:
@@ -776,7 +813,7 @@ executable class-neg
 
 executable reflect-neg
     main-is:          Main.hs
-    if !flag(build-negs)
+    if !flag(build-neg)
       buildable:      False
 
     other-modules:
@@ -796,6 +833,8 @@ executable reflect-neg
 
 executable measure-pos
     main-is:          Main.hs
+    if !flag(build-pos)
+      buildable:      False
 
     other-modules:
                       AbsMeasure
@@ -836,7 +875,7 @@ executable measure-pos
 
 executable measure-neg
     main-is:          Main.hs
-    if !flag(build-negs)
+    if !flag(build-neg)
       buildable:      False
 
     other-modules:
@@ -868,6 +907,8 @@ executable measure-neg
 
 executable datacon-pos
     main-is:          Main.hs
+    if !flag(build-pos)
+      buildable:      False
 
     other-modules:
                       AdtPeano2
@@ -897,7 +938,7 @@ executable datacon-pos
 
 executable datacon-neg
     main-is:          Main.hs
-    if !flag(build-negs)
+    if !flag(build-neg)
       buildable:      False
 
     other-modules:
@@ -925,7 +966,7 @@ executable datacon-neg
 
 executable unit-neg
     main-is:          Main.hs
-    if !flag(build-negs)
+    if !flag(build-neg)
       buildable:      False
 
     hs-source-dirs:   app
@@ -1152,7 +1193,9 @@ executable unit-neg
 executable unit-pos
     main-is:          Main.hs
     -- Modules included in this executable, other than Main.
-    
+    if !flag(build-pos)
+      buildable:      False
+
     other-modules:
                       Abs
                     , Absref_crash0
@@ -1713,6 +1756,8 @@ executable unit-pos
 
 executable absref-pos
     main-is:          Main.hs
+    if !flag(build-pos)
+      buildable:      False
 
     other-modules:
                       AbsRef00
@@ -1741,7 +1786,7 @@ executable absref-pos
 
 executable absref-neg
     main-is:          Main.hs
-    if !flag(build-negs)
+    if !flag(build-neg)
       buildable:      False
 
     other-modules:
@@ -1767,7 +1812,7 @@ executable absref-neg
 
 executable basic-neg
     main-is:          Main.hs
-    if !flag(build-negs)
+    if !flag(build-neg)
       buildable:      False
 
     other-modules:
@@ -1794,6 +1839,8 @@ executable basic-neg
 
 executable basic-pos
     main-is:          Main.hs
+    if !flag(build-pos)
+      buildable:      False
 
     other-modules:
                       Alias00
@@ -1827,6 +1874,8 @@ executable basic-pos
 
 executable import-cli
     main-is:          Main.hs
+    if !flag(build-pos)
+      buildable:      False
 
     other-modules:
                       CliAliasGen00
@@ -1916,6 +1965,8 @@ executable import-cli
 
 executable ple-pos
     main-is:          Main.hs
+    if !flag(build-pos)
+      buildable:      False
 
     other-modules:
                       BinahQuery
@@ -1981,7 +2032,7 @@ executable ple-pos
 
 executable ple-neg
     main-is:          Main.hs
-    if !flag(build-negs)
+    if !flag(build-neg)
       buildable:      False
 
 
@@ -2016,6 +2067,8 @@ executable ple-neg
 
 executable rankN-pos
     main-is:          Main.hs
+    if !flag(build-pos)
+      buildable:      False
 
     other-modules:
                       Test0
@@ -2035,6 +2088,8 @@ executable rankN-pos
 
 executable terminate-pos
     main-is:          Main.hs
+    if !flag(build-pos)
+      buildable:      False
 
     other-modules:
                       Ackermann
@@ -2071,7 +2126,7 @@ executable terminate-pos
 
 executable terminate-neg
     main-is:          Main.hs
-    if !flag(build-negs)
+    if !flag(build-neg)
       buildable:      False
 
     other-modules:

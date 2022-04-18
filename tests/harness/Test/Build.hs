@@ -1,8 +1,21 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE DerivingStrategies #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module Test.Build where
 
+
+import qualified Shelly as Sh
+import Shelly (Sh)
+import qualified Data.Map as M
+import qualified Text.PrettyPrint.ANSI.Leijen as PP
+import Test.Groups
+import Test.Summary
+import Data.Traversable (for)
+import System.Exit (exitSuccess, exitFailure)
 import Data.Text (Text)
 import qualified Data.ByteString.Lazy as BS
 import qualified Data.Text as T
@@ -37,9 +50,7 @@ cabalBuild :: OnlyDeps -> TestGroupName -> IO (ExitCode, Text, Text)
 cabalBuild onlyDeps name = do
   projectFile <- lookupEnv "LIQUID_CABAL_PROJECT_FILE"
   command "cabal" $
-    [ "build"
-    , "--flag", "build-negs"
-    ]
+    [ "build" ]
     <> (if onlyDeps then [ "--only-dependencies" ] else [])
     <> (case projectFile of Nothing -> []; Just projectFile' -> [ "--project-file", T.pack projectFile' ])
     <> [ name ]
@@ -50,7 +61,9 @@ stackBuild onlyDeps name =
   command "stack"
      [ "build"
      , "--flag", "tests:stack"
-     , "--flag", "tests:build-negs"
+     , "--flag", "tests:build-neg"
+     , "--flag", "tests:build-pos"
+     , "--no-interleaved-output"
      , (if onlyDeps then "--only-dependencies" else "--")
      , ("tests:" <> name)
      ]
@@ -59,16 +72,18 @@ stackBuild onlyDeps name =
 -- that parses the results of running the build command. Outputs can be fed into
 -- functions in `Summary.hs`.
 buildAndParseResults
-  :: (OnlyDeps -> TestGroupName -> IO (ExitCode, Text, Text))
+  :: (Text -> Text)
+  -> (Text -> Text)
+  -> (OnlyDeps -> TestGroupName -> IO (ExitCode, Text, Text))
   -> TestGroupData
   -> IO (Either ErrorException (Map (Maybe ModuleName) [CompilerMessage]), Either ResultsException [ModuleInfo])
-buildAndParseResults builder tgd@TestGroupData {..} = do
+buildAndParseResults outputStripper errorStripper builder tgd@TestGroupData {..} = do
   T.putStrLn $ "Ensuring dependencies for " <> tgdName <> " are up to date..."
   void $ builder True tgdName
   T.putStrLn $ "Building " <> tgdName <> " for real now!"
   (_, out', err') <- builder False tgdName
-  let out = stripAnsiEscapeCodes out'
-      err = stripDDumpTimingsOutput . stripAnsiEscapeCodes $ err'
+  let out = outputStripper out'
+      err = errorStripper err'
   T.putStrLn out
   T.putStrLn $ "*** STDERR " <> tgdName <> " ***\n" <> err <> "\n*** END STDERR " <> tgdName <> " ***\n"
   errMap <-
@@ -84,3 +99,55 @@ buildAndParseResults builder tgd@TestGroupData {..} = do
   pure (errMap, results)
   where
     printError = T.putStrLn . T.pack . P.errorBundlePretty
+
+cabalTestEnv :: Sh ()
+cabalTestEnv =
+  Sh.unlessM (Sh.test_px "cabal") $ do
+    Sh.errorExit "Cannot find cabal on the path."
+
+cabalOutputStripper :: Text -> Text
+cabalOutputStripper = stripAnsiEscapeCodes
+
+cabalErrorStripper :: Text -> Text
+cabalErrorStripper = stripDDumpTimingsOutput . stripAnsiEscapeCodes
+
+stackTestEnv :: Sh ()
+stackTestEnv =
+  Sh.unlessM (Sh.test_px "stack") $ do
+    Sh.errorExit "Cannot find stack on the path."
+
+stackOutputStripper :: Text -> Text
+stackOutputStripper = cabalOutputStripper . stripStackHeader
+
+stackErrorStripper :: Text -> Text
+stackErrorStripper = cabalErrorStripper . stripStackHeader . stripBuildingAllMessages
+
+program :: Sh () -> (Text -> Text) -> (Text -> Text) -> (OnlyDeps -> TestGroupName -> IO (ExitCode, Text, Text)) -> IO ()
+program testEnv outputStripper errorStripper builder = do
+  Sh.shelly testEnv
+  flagsAndActions <- for (M.toList allTestGroups) $ \(_name, tgd) -> do
+    (err, res) <- buildAndParseResults outputStripper errorStripper builder tgd
+    let (flag, action) =
+          case (err, res) of
+            (Left errException, Left resException) ->
+              (True, printError errException >> printError resException)
+            (Left errException, _) -> (True, printError errException)
+            (_, Left resException) -> (True, printError resException)
+            (Right err', Right res') ->
+              (False, let doc = prettySummarizeResults err' tgd res' in PP.putDoc $ doc PP.<$> PP.empty)
+    action
+    pure (flag, action)
+  putStrLn "\n*** SUMMARY ***"
+  -- Redo all the actions in a summary
+  void $ traverse snd flagsAndActions
+  putStrLn "*** END SUMMARY ***\n"
+  if any fst flagsAndActions then do
+    putStrLn "Something went wrong, please check the above output."
+    exitFailure
+  else do
+    putStrLn "All tests passed!"
+    exitSuccess
+
+  where
+    printError :: PP.Pretty a => a -> IO ()
+    printError x = PP.putDoc $ PP.pretty x PP.<$> PP.empty

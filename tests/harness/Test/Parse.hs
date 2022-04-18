@@ -13,9 +13,10 @@ import qualified Text.Megaparsec.Char.Lexer as P hiding (space)
 import Data.Map (Map)
 import qualified Data.Map as M
 import qualified Data.List as L
+import Data.Maybe (fromMaybe)
 import Data.Void (Void)
 import Text.Megaparsec (ParseErrorBundle)
-import Control.Monad (void)
+import Control.Monad (void, (<=<))
 import Control.Applicative ((<|>))
 import Test.Types
 
@@ -252,6 +253,14 @@ errorMap tgd@TestGroupData {..} = do
 -- | Remove all lines that are from -ddump-timings from the input Text.
 stripDDumpTimingsOutput :: Text -> Text
 stripDDumpTimingsOutput = T.unlines . filter (not . ("*** " `T.isPrefixOf`)) . T.lines
+
+stripStackHeader :: Text -> Text
+stripStackHeader = T.unlines .
+                   fmap (\x -> fromMaybe x $ T.stripPrefix "> " <=< (pure . T.stripStart) <=< T.stripPrefix "tests" $ x) .
+                   T.lines
+
+stripBuildingAllMessages :: Text -> Text
+stripBuildingAllMessages = T.unlines . filter (not . ("Building all executables for"  `T.isPrefixOf`)) . T.lines
 
 -- | Use this function to parse stdout.
 parseResults :: TestGroupData -> Text -> Either (ParseErrorBundle Text Void) (Either ResultsException [ModuleInfo])

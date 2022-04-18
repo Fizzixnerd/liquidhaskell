@@ -8,7 +8,6 @@ import qualified Text.PrettyPrint.ANSI.Leijen as PP
 import Data.Map (Map)
 import qualified Data.Map as M
 import Data.List (sortOn)
-import qualified Data.Set as S
 
 -- | Create an "unflavored" ModuleInfoSummary, associating with each module the
 -- errors/warnings from stderr (if present), and marking as Safe or Unsafe.
