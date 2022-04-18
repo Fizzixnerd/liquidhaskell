@@ -30,12 +30,12 @@ summarizeResults errs tgd =
 -- See `TestFlavor` in `Types.hs` for details on the different flavors.
 flavorChecker :: (ModuleInfo -> Bool) -> Map (Maybe ModuleName) [CompilerMessage] -> TestFlavor -> ModuleInfoSummary a -> FlavorSummary
 flavorChecker filterPredicate _errs flavor (ModuleInfoSummary {..}) =
-  let (diff, alsoErrorMismatch) = S.fromList $ case flavor of
+  let (diff, alsoErrorMismatch) = case flavor of
         TFSafe -> (misUnsafe, Nothing)
         TFBench -> (misUnsafe, Nothing)
         TFUnsafe -> (misSafe, Nothing)
         TFError errs -> (misSafe, Just $ compareErrors misRan errs)
-      filteredDiffList = filter filterPredicate $ S.toList diff
+      filteredDiffList = filter filterPredicate diff
   in
     -- All good if no "failures" and all errors match (if applicable)
     if null filteredDiffList && maybe True null alsoErrorMismatch
