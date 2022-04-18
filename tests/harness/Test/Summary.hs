@@ -34,7 +34,7 @@ flavorChecker filterPredicate _errs flavor (ModuleInfoSummary {..}) =
         TFSafe -> (misUnsafe, Nothing)
         TFBench -> (misUnsafe, Nothing)
         TFUnsafe -> (misSafe, Nothing)
-        TFError _ -> (misSafe, Just $ compareErrors misRan errs)
+        TFError errs -> (misSafe, Just $ compareErrors misRan errs)
       filteredDiffList = filter filterPredicate $ S.toList diff
   in
     -- All good if no "failures" and all errors match (if applicable)
