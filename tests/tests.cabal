@@ -27,8 +27,7 @@ executable test-driver
     else
       main-is:        Driver_cabal.hs
 
-    -- TODO(matt) freeze versions
-    build-depends:    base
+    build-depends:    base < 5
                     , shelly
                     , text
                     , bytestring
@@ -68,7 +67,7 @@ executable benchmark-stitch-lh
     other-modules:
                       Language.Stitch.LH.Repl
                     , Language.Stitch.LH.Check
-                 -- , Language.Stitch.LH.CSE
+                    , Language.Stitch.LH.CSE
                     , Language.Stitch.LH.Data.List
                     , Language.Stitch.LH.Data.Map
                     , Language.Stitch.LH.Eval
@@ -351,7 +350,6 @@ executable prover-nople-neg
                     -- , Ackermann
                     -- , ApplicativeList
                     -- , ApplicativeReader
-                    -- from lib:
 
   build-depends:      liquid-base
                     , liquid-prelude
@@ -419,6 +417,7 @@ executable benchmark-text
 
   if impl(ghc < 9.0)
     other-modules:
+      -- breaks on GHC 9.0+
       Data.Text.Foreign
 
   other-modules:
@@ -536,9 +535,9 @@ executable errors
                     , EmptyData
                     , EmptySig
                     , ErrLocation2
-                    -- , ErrLocation
-                    , ExportMeasure0
-                    , ExportReflect0
+                    , ErrLocation
+                    -- , ExportMeasure0
+                    -- , ExportReflect0
                     , Fractional
                     , Frog
                     , HigherOrderBinder
@@ -820,7 +819,7 @@ executable measure-pos
                     , Ple00
                     , Ple01
                     , Ple1
-                    , Ple1Libq
+                    , Ple1Lib
                     , PruneHO
                     , RecordAccessors
                     , Using00

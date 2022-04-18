@@ -1,4 +1,4 @@
-{-# OPTIONS_GHC -fclear-plugins #-}
+{-@ LIQUID "--skip-module" @-}
 
 module Main where
 

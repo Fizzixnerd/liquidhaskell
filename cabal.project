@@ -8,7 +8,6 @@ packages: .
           ./liquid-prelude
           ./liquid-vector
           ./liquid-platform
-          ./lh-renamer
           ./tests
           ./tests/benchmarks/popl18/lib
 

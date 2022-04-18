@@ -22,7 +22,7 @@ import System.Environment
 type OnlyDeps = Bool
 
 -- | Simple wrapper around `readProcess` and `proc` of `System.Process.Typed`.
--- Collects and exit code, stdout, and stderr
+-- Collects an exit code, stdout, and stderr.
 command :: Text -> [Text] -> IO (ExitCode, Text, Text)
 command cmd args = do
   (ec, out, err) <- readProcess (proc (T.unpack cmd) (T.unpack <$> args))

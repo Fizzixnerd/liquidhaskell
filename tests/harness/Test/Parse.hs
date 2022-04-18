@@ -150,7 +150,7 @@ ghcPanic = do
 --    |     ^^^^^^^^
 --
 -- Because we aren't parsing JSON yet, this is our "delimiter" for the end of a
--- message. The important parts are the spaes, pipes (|) and number. The rest is
+-- message. The important parts are the spaces, pipes (|) and number. The rest is
 -- skipped.
 compilerMessage :: TestGroupName -> Parser (Either ErrorException CompilerMessage)
 compilerMessage testGroupName = do

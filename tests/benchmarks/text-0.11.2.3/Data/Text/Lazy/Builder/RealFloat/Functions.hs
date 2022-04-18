@@ -1,5 +1,4 @@
---XXX(matt.walker): Shouldn't use liquid
-{-# OPTIONS_GHC -fclear-plugins #-}
+{-@ LIQUID "--skip-module" @-}
 
 -- |
 -- Module:    Data.Text.Lazy.Builder.RealFloat.Functions

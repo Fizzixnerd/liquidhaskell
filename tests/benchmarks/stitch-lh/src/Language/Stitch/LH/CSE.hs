@@ -1,3 +1,4 @@
+{-@ LIQUID "--skip-module" @-}
 {-# LANGUAGE PolyKinds, GADTs, MultiParamTypeClasses, LambdaCase,
              TypeFamilies, TypeOperators, RankNTypes, AllowAmbiguousTypes,
              ScopedTypeVariables, TypeApplications, DataKinds #-}
