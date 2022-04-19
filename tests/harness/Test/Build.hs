@@ -164,7 +164,7 @@ program testEnv outputStripper errorStripper builder = do
   -- Redo all the actions in a summary
   void $ traverse (\(_, action, _) -> action) flagsAndActions
   T.putStrLn "*** END SUMMARY ***\n"
-  T.putStrLn $ "Total successful tests: " <> (T.pack $ show $ sum $ catMaybes $ fmap (\(_, _, numRan) -> numRan) flagsAndActions)
+  T.putStrLn $ "Total tests ran: " <> (T.pack $ show $ sum $ catMaybes $ fmap (\(_, _, numRan) -> numRan) flagsAndActions)
   if any (\(flag, _ , _) -> flag) flagsAndActions then do
     T.putStrLn "Something went wrong, please check the above output."
     exitFailure
