@@ -185,6 +185,10 @@ data FlavorSummary =
       (Maybe [(ModuleInfo, ErrorMsg)]) -- ^ modules which had the wrong error messages (if relevant)
   deriving stock (Eq, Ord, Show)
 
+numberRan :: FlavorSummary -> NumberRan
+numberRan (FSAllGood ran) = ran
+numberRan (FSUnexpected ran _ _) = ran
+
 instance Pretty FlavorSummary where
   pretty (FSAllGood ran) =
     PP.indent nesting $

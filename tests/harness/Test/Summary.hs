@@ -9,21 +9,25 @@ import Data.Map (Map)
 import qualified Data.Map as M
 import Data.List (sortOn)
 
--- | Create an "unflavored" ModuleInfoSummary, associating with each module the
+-- | Create an "flavored" ModuleInfoSummary, associating with each module the
 -- errors/warnings from stderr (if present), and marking as Safe or Unsafe.
-summarizeResults :: Map (Maybe ModuleName) [CompilerMessage] -> TestGroupData -> [ModuleInfo] -> ModuleInfoSummary ()
-summarizeResults errs tgd =
-  foldr (\mi' summary ->
-            let mi = mi' { miMessages = M.findWithDefault mempty (Just . chModule . miHeader $ mi') errs }
-            in
-              if null $ filter (\m -> cmMood m == MError) (miMessages mi) then
-                summary { misRan = mi : misRan summary
-                        , misSafe = mi : misSafe summary }
-              else
-                summary { misRan = mi :  misRan summary
-                        , misUnsafe = mi : misUnsafe summary })
-
-        (ModuleInfoSummary [] [] [] tgd ())
+summarizeResults :: Map (Maybe ModuleName) [CompilerMessage] -> TestGroupData -> [ModuleInfo] -> ModuleInfoSummary FlavorSummary
+summarizeResults errs tgd modinfos =
+  let vanillaResults =
+        foldr (\mi' summary ->
+                 let mi = mi' { miMessages = M.findWithDefault mempty (Just . chModule . miHeader $ mi') errs }
+                 in
+                   if null $ filter (\m -> cmMood m == MError) (miMessages mi) then
+                     summary { misRan = mi : misRan summary
+                             , misSafe = mi : misSafe summary }
+                   else
+                     summary { misRan = mi :  misRan summary
+                             , misUnsafe = mi : misUnsafe summary })
+              (ModuleInfoSummary [] [] [] tgd ())
+              modinfos
+      flavorResults = flavorChecker (\ModuleInfo {..} -> chModule miHeader /= T.pack "Main") errs (tgdFlavor tgd) vanillaResults
+  in
+    vanillaResults { misSummary = flavorResults }
 
 -- | Create a `FlavorSummary` from the `TestFlavor` that was meant to be run.
 -- See `TestFlavor` in `Types.hs` for details on the different flavors.
@@ -53,8 +57,4 @@ flavorChecker filterPredicate _errs flavor (ModuleInfoSummary {..}) =
 -- | A wrapper around `PP.pretty` that returns a `PP.Doc` representation of the
 -- flavored summary.
 prettySummarizeResults :: Map (Maybe ModuleName) [CompilerMessage] -> TestGroupData -> [ModuleInfo] -> PP.Doc
-prettySummarizeResults errs tgd modinfos =
-  let vanillaResults = summarizeResults errs tgd modinfos
-      flavorResults = flavorChecker (\ModuleInfo {..} -> chModule miHeader /= T.pack "Main") errs (tgdFlavor tgd) vanillaResults
-  in
-    PP.pretty $ vanillaResults { misSummary = flavorResults }
+prettySummarizeResults errs tgd modinfos = PP.pretty $ summarizeResults errs tgd modinfos

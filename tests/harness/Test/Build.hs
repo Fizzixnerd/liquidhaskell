@@ -7,7 +7,6 @@
 
 module Test.Build where
 
-
 import qualified Shelly as Sh
 import Shelly (Sh)
 import qualified Data.Map as M
@@ -23,6 +22,7 @@ import qualified Data.Text.IO as T
 import qualified Data.Text.Encoding as TE
 import qualified Text.Megaparsec as P
 import Data.Map (Map)
+import Data.Maybe (catMaybes)
 import Data.List (partition, intersperse)
 import Test.Types
 import Test.Parse hiding (results)
@@ -131,25 +131,31 @@ program testEnv outputStripper errorStripper builder = do
   allTestGroups' <- M.toList <$> allTestGroups
   flagsAndActions <- for allTestGroups' $ \(_name, tgd) -> do
     (err, res) <- buildAndParseResults outputStripper errorStripper builder tgd
-    let (flag, action) =
+    let (flag, action, numRan) =
           case (err, res) of
             (Left errException, Left resException) ->
-              (True, printError errException >> printError resException)
-            (Left errException, _) -> (True, printError errException)
-            (_, Left resException) -> (True, printError resException)
+              (True, printError errException >> printError resException, Nothing)
+            (Left errException, _) -> (True, printError errException, Nothing)
+            (_, Left resException) -> (True, printError resException, Nothing)
             (Right err', Right res') ->
-              (False, let doc = prettySummarizeResults err' tgd res' in PP.putDoc $ doc PP.<$> PP.empty)
+              let
+                summary = summarizeResults err' tgd res'
+              in
+                ( False
+                , PP.putDoc $ PP.pretty summary PP.<$> PP.empty
+                , Just $ numberRan $ misSummary summary)
     action
-    pure (flag, action)
-  putStrLn "\n*** SUMMARY ***"
+    pure (flag, action, numRan)
+  T.putStrLn "\n*** SUMMARY ***"
   -- Redo all the actions in a summary
-  void $ traverse snd flagsAndActions
-  putStrLn "*** END SUMMARY ***\n"
-  if any fst flagsAndActions then do
-    putStrLn "Something went wrong, please check the above output."
+  void $ traverse (\(_, action, _) -> action) flagsAndActions
+  T.putStrLn "*** END SUMMARY ***\n"
+  T.putStrLn $ "Total successful tests: " <> (T.pack $ show $ sum $ catMaybes $ fmap (\(_, _, numRan) -> numRan) flagsAndActions)
+  if any (\(flag, _ , _) -> flag) flagsAndActions then do
+    T.putStrLn "Something went wrong, please check the above output."
     exitFailure
   else do
-    putStrLn "All tests passed!"
+    T.putStrLn "All tests passed!"
     exitSuccess
 
   where

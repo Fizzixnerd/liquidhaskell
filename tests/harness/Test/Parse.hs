@@ -239,6 +239,13 @@ results TestGroupData {..} =
 -- details.
 errorMap :: TestGroupData -> Parser (Either ErrorException (Map (Maybe ModuleName) [CompilerMessage]))
 errorMap tgd@TestGroupData {..} = do
+  -- TODO(matt.walker): optionally parse segfaults and double frees (examples
+  -- below; stderr
+  -- "cabal: Failed to build exe:class-pos from tests-0.1.0.0. The build process
+  --  segfaulted (i.e. SIGSEGV)."
+  -- "double free or corruption (out)
+  --  cabal: Failed to build exe:errors from tests-0.1.0.0. The build process
+  --  terminated with exit code -6"
   P.option () (void $ P.many $ P.chunk "Unknown flag: -B" *> P.eol)
   messages <- compilerMessage tgdName `P.sepEndBy` P.eol
   pure $ do

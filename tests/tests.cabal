@@ -2103,7 +2103,7 @@ executable ple-pos
                     , Tmp1
                     , Tmp
 
-                    -- XXX(matt.walker): RANDOM FAILURES in T1302b when -j provided
+                    -- XXX(matt.walker): RANDOM FAILURES in T1302b when  provided
     ghc-options:      -fplugin=LiquidHaskell -ddump-timings -ddump-to-file -fkeep-going -O0
     build-depends:    liquid-base
                     , liquid-prelude
@@ -2141,7 +2141,7 @@ executable ple-neg
                     , T1409
                     , T1424
 
-                    -- XXX(matt.walker): SEGFAUTS WITH -j (!?)
+                    -- XXX(matt.walker): SEGFAUTS WITH  (!?)
     ghc-options:      -fplugin=LiquidHaskell -ddump-timings -ddump-to-file -fkeep-going -O0
     build-depends:    liquid-base
                     , liquid-prelude
@@ -2167,7 +2167,7 @@ executable rankN-pos
                     , Test1
 
 
-    ghc-options:      -fplugin=LiquidHaskell -ddump-timings -ddump-to-file -fkeep-going -O0 -j
+    ghc-options:      -fplugin=LiquidHaskell -ddump-timings -ddump-to-file -fkeep-going -O0 
     build-depends:    liquid-base
                     , liquid-prelude
                     , liquidhaskell
@@ -2207,7 +2207,7 @@ executable terminate-pos
                     , T1403
                     , Term00
 
-    ghc-options:      -fplugin=LiquidHaskell -ddump-timings -ddump-to-file -fkeep-going -O0 -j
+    ghc-options:      -fplugin=LiquidHaskell -ddump-timings -ddump-to-file -fkeep-going -O0 
     build-depends:    liquid-base
                     , liquid-prelude
                     , liquid-containers
@@ -2243,7 +2243,7 @@ executable terminate-neg
                     , Total01
                     , Total02
 
-    ghc-options:      -fplugin=LiquidHaskell -ddump-timings -ddump-to-file -fkeep-going -O0 -j
+    ghc-options:      -fplugin=LiquidHaskell -ddump-timings -ddump-to-file -fkeep-going -O0 
     build-depends:    liquid-base
                     , liquid-prelude
                     , liquidhaskell
