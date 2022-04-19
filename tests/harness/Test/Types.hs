@@ -30,6 +30,11 @@ type ConstraintsChecked = Int
 
 type Parser = Parsec Void Text
 
+data Options = Options
+  { testGroups :: [TestGroupName]
+  }
+  deriving stock (Eq, Ord, Show)
+
 data TestGroupData = TestGroupData
   { tgdName :: TestGroupName
   , tgdDirectories :: [Text]

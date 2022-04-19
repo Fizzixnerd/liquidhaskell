@@ -139,39 +139,47 @@ stackErrorStripper = cabalErrorStripper . stripStackExtraneousMessages . stripSt
 
 -- | For building `main`; provided so that we don't repeat outselves in
 -- "Driver_cabal.hs" and "Driver_stack.hs"
-program :: Sh () -> (Text -> Text) -> (Text -> Text) -> (OnlyDeps -> TestGroupName -> IO (ExitCode, Text, Text)) -> IO ()
-program testEnv outputStripper errorStripper builder = do
+program :: Sh () -> (Text -> Text) -> (Text -> Text) -> (OnlyDeps -> TestGroupName -> IO (ExitCode, Text, Text)) -> Options -> IO ()
+program testEnv outputStripper errorStripper builder os = do
   Sh.shelly testEnv
-  allTestGroups' <- M.toList <$> allTestGroups
-  flagsAndActions <- for allTestGroups' $ \(_name, tgd) -> do
-    (err, res) <- buildAndParseResults outputStripper errorStripper builder tgd
-    let (flag, action, numRan) =
-          case (err, res) of
-            (Left errException, Left resException) ->
-              (True, printError errException >> printError resException, Nothing)
-            (Left errException, _) -> (True, printError errException, Nothing)
-            (_, Left resException) -> (True, printError resException, Nothing)
-            (Right err', Right res') ->
-              let
-                summary = summarizeResults err' tgd res'
-              in
-                ( False
-                , PP.putDoc $ PP.pretty summary PP.<$> PP.empty
-                , Just $ numberRan $ misSummary summary)
-    action
-    pure (flag, action, numRan)
-  T.putStrLn "\n*** SUMMARY ***"
-  -- Redo all the actions in a summary
-  void $ traverse (\(_, action, _) -> action) flagsAndActions
-  T.putStrLn "*** END SUMMARY ***\n"
-  T.putStrLn $ "Total tests ran: " <> (T.pack $ show $ sum $ catMaybes $ fmap (\(_, _, numRan) -> numRan) flagsAndActions)
-  if any (\(flag, _ , _) -> flag) flagsAndActions then do
-    T.putStrLn "Something went wrong, please check the above output."
-    exitFailure
-  else do
-    T.putStrLn "All tests passed!"
-    exitSuccess
-
+  allTestGroupsMap <- allTestGroups
+  let selectedGroups = for (testGroups os) $ \name -> M.lookup name allTestGroupsMap
+  case selectedGroups of
+    Nothing -> do
+      T.putStrLn "You selected a bad test group name.  Run with --help to see available options."
+      exitFailure
+    Just testGroupsSelected -> do
+      let selectedTestGroups = if null testGroupsSelected then snd <$> M.toList allTestGroupsMap else testGroupsSelected
+      flagsAndActions <- for selectedTestGroups $ \tgd -> do
+        (err, res) <- buildAndParseResults outputStripper errorStripper builder tgd
+        let (flag, action, numRan) =
+              case (err, res) of
+                (Left errException, Left resException) ->
+                  (True, printError errException >> printError resException, Nothing)
+                (Left errException, _) -> (True, printError errException, Nothing)
+                (_, Left resException) -> (True, printError resException, Nothing)
+                (Right err', Right res') ->
+                  let
+                    summary = summarizeResults err' tgd res'
+                  in
+                    ( False
+                    , PP.putDoc $ PP.pretty summary PP.<$> PP.empty
+                    , Just $ numberRan $ misSummary summary)
+        action
+        pure (flag, action, numRan)
+      T.putStrLn "\n*** SUMMARY ***"
+      -- Redo all the actions in a summary
+      void $ traverse (\(_, action, _) -> action) flagsAndActions
+      T.putStrLn "*** END SUMMARY ***\n"
+      T.putStrLn $ "Total tests ran: " <> (T.pack $ show $ sum $ catMaybes $ fmap (\(_, _, numRan) -> numRan) flagsAndActions)
+      if any (\(flag, _ , _) -> flag) flagsAndActions
+        then do
+          T.putStrLn "Something went wrong, please check the above output."
+          exitFailure
+        else do
+          T.putStrLn "All tests passed!"
+          exitSuccess
   where
     printError :: PP.Pretty a => a -> IO ()
     printError x = PP.putDoc $ PP.pretty x PP.<$> PP.empty
+

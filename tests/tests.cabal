@@ -31,6 +31,7 @@ executable test-driver
                     , megaparsec
                     , ansi-wl-pprint
                     , typed-process
+                    , optparse-applicative
                     , strip-ansi-escape >= 0.1
                     , filepath >= 1.4.2
 
@@ -39,6 +40,7 @@ executable test-driver
                     , Test.Parse
                     , Test.Groups
                     , Test.Summary
+                    , Test.Options
 
     hs-source-dirs:   harness
     default-language: Haskell2010

@@ -90,13 +90,19 @@ allowStackPaths xs = do
 -- the pwd so that we can absolute-ify the paths, which stack outputs (cabal
 -- uses relative paths).
 allTestGroups :: IO (Map TestGroupName TestGroupData)
-allTestGroups =
-  allowStackPaths
-  $ mconcat [ microTestGroups
-            , benchmarkTestGroups
-            , proverTestGroups
-            , errorsTestGroups
-            ]
+allTestGroups = allowStackPaths allTestGroupDataPlain
+
+-- | Update this when you add new "classes" of `TestGroupData`
+allTestGroupDataPlain :: [TestGroupData]
+allTestGroupDataPlain =
+  mconcat [ microTestGroups
+          , benchmarkTestGroups
+          , proverTestGroups
+          , errorsTestGroups
+          ]
+
+allTestGroupNames :: [TestGroupName]
+allTestGroupNames = tgdName <$> allTestGroupDataPlain
 
 -- * `TFError`-flavored tests are tests which we check the error message to make
 --   sure it matches what we expect (using `T.isInfixOf`). Below are some
