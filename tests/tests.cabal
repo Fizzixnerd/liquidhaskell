@@ -13,19 +13,8 @@ author:             The Liquid Haskell Developers
 flag stack
   default:     False
   description: Enable when building with stack to prevent tests
-               from using cabal-install.
-
-flag build-neg
-  default:     False
-  description: Whether to build negative tests. Useful to disable with stack
-               which insists on building everything which is buildable on first
-               run.
-
-flag build-pos
-  default:     False
-  description: Whether to build positive tests. Useful to disable with stack
-               which insists on building everything which is buildable on first
-               run.
+               from using cabal-install, and to mark all executables as
+               " buildable: False " by default
 
 executable test-driver
     if flag(stack)

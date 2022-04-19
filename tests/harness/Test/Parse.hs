@@ -275,7 +275,8 @@ stripStackExtraneousMessages = T.stripStart
                                            || "initializing package database:" `T.isPrefixOf` x
                                            || "Installing executable " `T.isPrefixOf` x
                                            || "Linking " `T.isPrefixOf` x
-                                           || "systool:" `T.isPrefixOf` x)
+                                           || "systool:" `T.isPrefixOf` x
+                                           || "Completed " `T.isPrefixOf` x)
                                . T.lines
   where
     throwOutFooter = go []
