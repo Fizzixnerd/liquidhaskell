@@ -291,7 +291,9 @@ stripStackExtraneousMessages = T.stripStart
                                . T.unlines
                                . throwOutFooter
                                . filter (\x ->
-                                           not $ x == "configure (exe)"
+                                           not $
+                                              "configure (exe)" `T.isSuffixOf` x
+                                           || "contigure (lib)" `T.isSuffixOf` x
                                            || "build (lib)" `T.isSuffixOf` x
                                            || "copy/register" `T.isSuffixOf` x
                                            || "build (exe)" `T.isSuffixOf` x
