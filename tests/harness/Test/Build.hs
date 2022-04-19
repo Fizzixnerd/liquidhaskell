@@ -56,12 +56,14 @@ cabalBuild onlyDeps name = do
     <> (case projectFile of Nothing -> []; Just projectFile' -> [ "--project-file", T.pack projectFile' ])
     <> [ name ]
 
--- | Build using stack.  XXX Currently doesn't work
+-- | Build using stack. This *emulates* the output of the cabalBuild by splitting
+-- the interleaved stdout/stderr that stack normally outputs into two Texts.
 stackBuild :: OnlyDeps -> TestGroupName -> IO (ExitCode, Text, Text)
 stackBuild onlyDeps name = do
   (ec, _out, err) <- command "stack" $
      [ "build"
      , "--flag", "tests:stack"
+       -- Enables that particular executable in the cabal file
      , "--flag", ("tests:" <> name)
      , "--no-interleaved-output" ]
      <> (if onlyDeps then [ "--only-dependencies" ] else [])
@@ -103,28 +105,40 @@ buildAndParseResults outputStripper errorStripper builder tgd@TestGroupData {..}
   where
     printError = T.putStrLn . T.pack . P.errorBundlePretty
 
-cabalTestEnv :: Sh ()
-cabalTestEnv =
-  Sh.unlessM (Sh.test_px "cabal") $ do
-    Sh.errorExit "Cannot find cabal on the path."
+-- | Ensure prog is on the PATH
+ensurePathContains :: Text -> Sh ()
+ensurePathContains prog =
+  Sh.unlessM (Sh.test_px $ T.unpack prog) $ do
+    Sh.errorExit $ "Cannot find " <> prog <> " on the path."
 
+-- | Make sure cabal is available
+cabalTestEnv :: Sh ()
+cabalTestEnv = ensurePathContains "cabal"
+
+-- | Strip colors and so on from stdout
 cabalOutputStripper :: Text -> Text
 cabalOutputStripper = stripAnsiEscapeCodes
 
+-- | Strip colors and -ddump-timings noise from stderr
 cabalErrorStripper :: Text -> Text
 cabalErrorStripper = stripDDumpTimingsOutput . stripAnsiEscapeCodes
 
+-- | Make sure stack is available
 stackTestEnv :: Sh ()
-stackTestEnv =
-  Sh.unlessM (Sh.test_px "stack") $ do
-    Sh.errorExit "Cannot find stack on the path."
+stackTestEnv = ensurePathContains "stack"
 
+-- | Strip colors and the stack header from "stdout" (see buildStack; not
+-- actually stdout)
 stackOutputStripper :: Text -> Text
 stackOutputStripper = cabalOutputStripper . stripStackHeader
 
+-- | Strip colors and extra messages from "stderr" (see buildStack; not actually
+-- stderr)
 stackErrorStripper :: Text -> Text
 stackErrorStripper = cabalErrorStripper . stripStackExtraneousMessages . stripStackHeader
 
+-- | For building `main`; provided so that we don't repeat outselves in
+-- "Driver_cabal.hs" and "Driver_stack.hs"
 program :: Sh () -> (Text -> Text) -> (Text -> Text) -> (OnlyDeps -> TestGroupName -> IO (ExitCode, Text, Text)) -> IO ()
 program testEnv outputStripper errorStripper builder = do
   Sh.shelly testEnv

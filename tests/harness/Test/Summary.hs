@@ -9,7 +9,7 @@ import Data.Map (Map)
 import qualified Data.Map as M
 import Data.List (sortOn)
 
--- | Create an "flavored" ModuleInfoSummary, associating with each module the
+-- | Create a "flavored" ModuleInfoSummary, associating with each module the
 -- errors/warnings from stderr (if present), and marking as Safe or Unsafe.
 summarizeResults :: Map (Maybe ModuleName) [CompilerMessage] -> TestGroupData -> [ModuleInfo] -> ModuleInfoSummary FlavorSummary
 summarizeResults errs tgd modinfos =

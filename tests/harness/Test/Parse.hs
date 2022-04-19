@@ -234,24 +234,33 @@ results TestGroupData {..} =
             then pure $ Left $ EmptyResultsException tgdName
             else pure $ Right xs)
 
+-- | Parse a segfault message
+segFault :: TestGroupName -> Parser ErrorException
+segFault n = SegFaultException n <$ do
+  P.try $ do
+    void $ P.chunk "cabal: Failed to build "
+    skipRestOfLine
+  P.chunk "segfaulted (i.e. SIGSEGV)."
+
+-- | Parse a double free message
+doubleFree :: TestGroupName -> Parser ErrorException
+doubleFree n = DoubleFreeException n <$ P.chunk "double free or corruption (out)"
+
 -- | Top level stderr parser. Uses the list of directories in a `TestGroupData`
 -- to properly nail down the moduleName. See `safeModuleName` in `Types.hs` for
 -- details.
 errorMap :: TestGroupData -> Parser (Either ErrorException (Map (Maybe ModuleName) [CompilerMessage]))
 errorMap tgd@TestGroupData {..} = do
-  -- TODO(matt.walker): optionally parse segfaults and double frees (examples
-  -- below; stderr
-  -- "cabal: Failed to build exe:class-pos from tests-0.1.0.0. The build process
-  --  segfaulted (i.e. SIGSEGV)."
-  -- "double free or corruption (out)
-  --  cabal: Failed to build exe:errors from tests-0.1.0.0. The build process
-  --  terminated with exit code -6"
-  P.option () (void $ P.many $ P.chunk "Unknown flag: -B" *> P.eol)
-  messages <- compilerMessage tgdName `P.sepEndBy` P.eol
-  pure $ do
-    msgs <- sequence messages
-    let grouped = L.groupBy (\m n -> fsName (cmSpan m) == fsName (cmSpan n)) msgs
-    pure $ M.unions $ M.unionsWith (<>) <$> toMaps <$> grouped
+  segFaultOrDoubleFree <- P.option Nothing (Just <$> (segFault tgdName <|> doubleFree tgdName))
+  case segFaultOrDoubleFree of
+    Just ex -> pure $ Left ex
+    Nothing -> do
+      P.option () (void $ P.many $ P.chunk "Unknown flag: -B" *> P.eol)
+      messages <- compilerMessage tgdName `P.sepEndBy` P.eol
+      pure $ do
+        msgs <- sequence messages
+        let grouped = L.groupBy (\m n -> fsName (cmSpan m) == fsName (cmSpan n)) msgs
+        pure $ M.unions $ M.unionsWith (<>) <$> toMaps <$> grouped
   where
     toMaps :: [CompilerMessage] -> [Map (Maybe ModuleName) [CompilerMessage]]
     toMaps [] = mempty
@@ -261,11 +270,13 @@ errorMap tgd@TestGroupData {..} = do
 stripDDumpTimingsOutput :: Text -> Text
 stripDDumpTimingsOutput = T.unlines . filter (not . ("*** " `T.isPrefixOf`)) . T.lines
 
+-- | Remove the header for "tests > " if it exists on a line.
 stripStackHeader :: Text -> Text
 stripStackHeader = T.unlines .
                    fmap (\x -> fromMaybe x $ T.stripPrefix "> " <=< (pure . T.stripStart) <=< T.stripPrefix "tests" $ x) .
                    T.lines
 
+-- | Filter out all the messages we don't care about from the stack output
 stripStackExtraneousMessages :: Text -> Text
 stripStackExtraneousMessages = T.stripStart
                                . T.unlines
@@ -289,6 +300,8 @@ stripStackExtraneousMessages = T.stripStart
                                            || "Enable expansion" `T.isPrefixOf` x)
                                . T.lines
   where
+    -- | throw out everything after a magic string indicating compilation is
+    -- complete
     throwOutFooter = go []
     go acc [] = reverse acc
     go acc (x:xs)

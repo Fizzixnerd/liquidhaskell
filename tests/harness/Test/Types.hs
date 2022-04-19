@@ -234,6 +234,8 @@ instance Pretty ResultsException where
 -- a fairly major bug. "Fishy" parses are anything that we don't recognize.
 data ErrorException =
     GhcPanicException TestGroupName GhcPanic
+  | SegFaultException TestGroupName
+  | DoubleFreeException TestGroupName
   | FishyErrorParseException TestGroupName
   deriving stock (Eq, Ord, Show)
 
@@ -241,8 +243,12 @@ instance Pretty ErrorException where
   pretty (GhcPanicException test panic) =
     PP.magenta (PP.text (T.unpack test)) <> PP.text " caused ghc to " <> PP.red (PP.text "panic") <> PP.text " with message:"
     PP.<$> (PP.indent nesting $ pretty panic)
+  pretty (SegFaultException test) =
+    PP.magenta (PP.text (T.unpack test)) <> PP.text " caused ghc to " <> PP.red (PP.text "segfault") <> PP.text "."
+  pretty (DoubleFreeException test) =
+    PP.magenta (PP.text (T.unpack test)) <> PP.text " caused ghc to " <> PP.red (PP.text "call free twice on memory") <> PP.text "."
   pretty (FishyErrorParseException test) =
-     PP.magenta (PP.text (T.unpack test)) <> PP.text " had " <> PP.red (PP.text "fishy output") <> PP.text " from parser when attempting to scan stderr."
+    PP.magenta (PP.text (T.unpack test)) <> PP.text " had " <> PP.red (PP.text "fishy output") <> PP.text " from parser when attempting to scan stderr."
 
 -- | A fairly unstructured panic, suitable only for regurgitating the message.
 -- Do not try to recover; fix the code.
