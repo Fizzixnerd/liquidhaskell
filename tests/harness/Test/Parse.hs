@@ -15,7 +15,6 @@ import qualified Data.Map as M
 import qualified Data.List as L
 import Data.Maybe (fromMaybe)
 import Data.Void (Void)
-import Data.Char (isSpace)
 import Text.Megaparsec (ParseErrorBundle)
 import Control.Monad (void, (<=<))
 import Control.Applicative ((<|>))
@@ -257,7 +256,7 @@ errorMap tgd@TestGroupData {..} = do
     Just ex -> pure $ Left ex
     Nothing -> do
       P.option () (void $ P.many $ P.chunk "Unknown flag: -B" *> P.eol)
-      messages <- compilerMessage tgdName `P.sepEndBy` P.eol
+      messages <- compilerMessage tgdName `P.sepEndBy` P.space
       pure $ do
         msgs <- sequence messages
         let grouped = L.groupBy (\m n -> fsName (cmSpan m) == fsName (cmSpan n)) msgs
@@ -276,14 +275,11 @@ stripStackHeader :: Text -> Text
 stripStackHeader = T.unlines
                    . fmap (\x ->
                              fromMaybe x
-                             $ isNotSpacesM
-                               <=< T.stripPrefix "> "
+                             $     T.stripPrefix "> "
                                <=< (pure . T.stripStart)
                                <=< T.stripPrefix "tests"
                              $ x)
                    . T.lines
-  where
-    isNotSpacesM x = if T.all isSpace x then Nothing else Just x
 
 -- | Filter out all the messages we don't care about from the stack output
 stripStackExtraneousMessages :: Text -> Text
