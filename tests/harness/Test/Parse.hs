@@ -15,6 +15,7 @@ import qualified Data.Map as M
 import qualified Data.List as L
 import Data.Maybe (fromMaybe)
 import Data.Void (Void)
+import Data.Char (isSpace)
 import Text.Megaparsec (ParseErrorBundle)
 import Control.Monad (void, (<=<))
 import Control.Applicative ((<|>))
@@ -273,8 +274,16 @@ stripDDumpTimingsOutput = T.unlines . filter (not . ("*** " `T.isPrefixOf`)) . T
 -- | Remove the header for "tests> " if it exists on a line.
 stripStackHeader :: Text -> Text
 stripStackHeader = T.unlines
-                   . fmap (\x -> fromMaybe x $ T.stripPrefix "> " <=< (pure . T.stripStart) <=< T.stripPrefix "tests" $ x)
+                   . fmap (\x ->
+                             fromMaybe x
+                             $ isNotSpacesM
+                               <=< T.stripPrefix "> "
+                               <=< (pure . T.stripStart)
+                               <=< T.stripPrefix "tests"
+                             $ x)
                    . T.lines
+  where
+    isNotSpacesM x = if T.all isSpace x then Nothing else Just x
 
 -- | Filter out all the messages we don't care about from the stack output
 stripStackExtraneousMessages :: Text -> Text
