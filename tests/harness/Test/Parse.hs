@@ -270,11 +270,11 @@ errorMap tgd@TestGroupData {..} = do
 stripDDumpTimingsOutput :: Text -> Text
 stripDDumpTimingsOutput = T.unlines . filter (not . ("*** " `T.isPrefixOf`)) . T.lines
 
--- | Remove the header for "tests > " if it exists on a line.
+-- | Remove the header for "tests> " if it exists on a line.
 stripStackHeader :: Text -> Text
-stripStackHeader = T.unlines .
-                   fmap (\x -> fromMaybe x $ T.stripPrefix "> " <=< (pure . T.stripStart) <=< T.stripPrefix "tests" $ x) .
-                   T.lines
+stripStackHeader = T.unlines
+                   . fmap (\x -> fromMaybe x $ T.stripPrefix "> " <=< (pure . T.stripStart) <=< T.stripPrefix "tests" $ x)
+                   . T.lines
 
 -- | Filter out all the messages we don't care about from the stack output
 stripStackExtraneousMessages :: Text -> Text
@@ -282,9 +282,10 @@ stripStackExtraneousMessages = T.stripStart
                                . T.unlines
                                . throwOutFooter
                                . filter (\x ->
-                                           not $ x == "build (exe)"
-                                           || x == "configure (exe)"
-                                           || x == "copy/register"
+                                           not $ x == "configure (exe)"
+                                           || "build (lib)" `T.isSuffixOf` x
+                                           || "copy/register" `T.isSuffixOf` x
+                                           || "build (exe)" `T.isSuffixOf` x
                                            || "Configuring " `T.isPrefixOf` x
                                            || "Building all executables for" `T.isPrefixOf` x
                                            || "Preprocessing executable " `T.isPrefixOf` x
