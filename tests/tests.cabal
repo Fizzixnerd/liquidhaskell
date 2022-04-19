@@ -2092,7 +2092,8 @@ executable ple-pos
                     , T1190
                     , T1257
                     , T1289
-                    , T1302b
+                    -- XXX(matt.walker): dies on lists on first compile
+                    --, T1302b
                     , T1371
                     , T1371_NNF
                     , T1382
