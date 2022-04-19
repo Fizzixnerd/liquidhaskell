@@ -16,13 +16,13 @@ flag stack
                from using cabal-install.
 
 flag build-neg
-  default:     True
+  default:     False
   description: Whether to build negative tests. Useful to disable with stack
                which insists on building everything which is buildable on first
                run.
 
 flag build-pos
-  default:     True
+  default:     False
   description: Whether to build positive tests. Useful to disable with stack
                which insists on building everything which is buildable on first
                run.
@@ -55,9 +55,12 @@ executable test-driver
     default-language: Haskell2010
     ghc-options:      -O2 -j -Wall -Werror
 
+flag benchmark-stitch-lh
+     default: False
+
 executable benchmark-stitch-lh
     main-is:          Main.hs
-    if !flag(build-pos)
+    if !flag(benchmark-stitch-lh) && flag(stack)
       buildable:      False
     build-depends:    ansi-wl-pprint >= 0.6.7.1
                     , mtl >= 2.2.1
@@ -106,12 +109,14 @@ executable benchmark-stitch-lh
 
     default-language: Haskell2010
 
+flag benchmark-bytestring
+     default: False
+
 executable benchmark-bytestring
   main-is:            Main.hs
 
-  if !flag(build-pos)
+  if !flag(benchmark-bytestring) && flag(stack)
     buildable:      False
-
 
   hs-source-dirs:     app
                     , benchmarks/bytestring-0.9.2.1
@@ -136,12 +141,14 @@ executable benchmark-bytestring
   ghc-options:      -fplugin=LiquidHaskell -fkeep-going -ddump-timings -ddump-to-file -O0
   default-language: Haskell2010
 
+flag benchmark-vector-algorithms
+     default: False
+
 executable benchmark-vector-algorithms
   main-is:            Main.hs
 
-  if !flag(build-pos)
+  if !flag(benchmark-vector-algorithms) && flag(stack)
     buildable:        False
-
 
   hs-source-dirs:     app
                     , benchmarks/vector-algorithms-0.5.4.2
@@ -168,10 +175,13 @@ executable benchmark-vector-algorithms
   ghc-options:      -fplugin=LiquidHaskell -fkeep-going -ddump-timings -ddump-to-file -O0
   default-language: Haskell2010
 
+flag benchmark-cse230
+     default: False
+
 executable benchmark-cse230
   main-is:            Main.hs
 
-  if !flag(build-pos)
+  if !flag(benchmark-cse230) && flag(stack)
     buildable:        False
 
   hs-source-dirs:     app
@@ -194,9 +204,12 @@ executable benchmark-cse230
   ghc-options:      -fplugin=LiquidHaskell -fkeep-going -ddump-timings -ddump-to-file -O0
   default-language: Haskell2010
 
+flag benchmark-esop2013
+     default: False
+
 executable benchmark-esop2013
   main-is:            Main.hs
-  if !flag(build-pos)
+  if !flag(benchmark-esop2013) && flag(stack)
     buildable:        False
 
   hs-source-dirs:     app
@@ -219,9 +232,12 @@ executable benchmark-esop2013
   ghc-options:      -fplugin=LiquidHaskell -fkeep-going -ddump-timings -ddump-to-file -O0
   default-language: Haskell2010
 
+flag benchmark-icfp15-pos
+     default: False
+
 executable benchmark-icfp15-pos
   main-is:            Main.hs
-  if !flag(build-pos)
+  if !flag(benchmark-icfp15-pos) && flag(stack)
     buildable:        False
 
   hs-source-dirs:     app
@@ -259,9 +275,12 @@ executable benchmark-icfp15-pos
   ghc-options:      -fplugin=LiquidHaskell -fkeep-going -ddump-timings -ddump-to-file -O0
   default-language: Haskell2010
 
+flag benchmark-icfp15-neg
+     default: False
+
 executable benchmark-icfp15-neg
   main-is:            Main.hs
-  if !flag(build-neg)
+  if !flag(benchmark-icfp15-neg) && flag(stack)
     buildable:      False
 
   hs-source-dirs:     app
@@ -284,9 +303,12 @@ executable benchmark-icfp15-neg
   ghc-options:      -fplugin=LiquidHaskell -fkeep-going -ddump-timings -ddump-to-file -O0
   default-language: Haskell2010
 
+flag prover-foundations
+     default: False
+
 executable prover-foundations
   main-is:            Main.hs
-  if !flag(build-pos)
+  if !flag(prover-foundations) && flag(stack)
     buildable:        False
 
   hs-source-dirs:     app
@@ -304,9 +326,12 @@ executable prover-foundations
   ghc-options:      -fplugin=LiquidHaskell -fkeep-going -ddump-timings -ddump-to-file -O0
   default-language: Haskell2010
 
+flag prover-nople-pos
+     default: False
+
 executable prover-nople-pos
   main-is:            Main.hs
-  if !flag(build-pos)
+  if !flag(prover-nople-pos) && flag(stack)
     buildable:        False
 
   hs-source-dirs:     app
@@ -354,9 +379,12 @@ executable prover-nople-pos
   ghc-options:      -fplugin=LiquidHaskell -fkeep-going -ddump-timings -ddump-to-file -O0
   default-language: Haskell2010
 
+flag prover-nople-neg
+     default: False
+
 executable prover-nople-neg
   main-is:            Main.hs
-  if !flag(build-neg)
+  if !flag(prover-nople-neg) && flag(stack)
     buildable:        False
 
   hs-source-dirs:     app
@@ -387,9 +415,12 @@ executable prover-nople-neg
   ghc-options:      -fplugin=LiquidHaskell -fkeep-going -ddump-timings -ddump-to-file -O0
   default-language: Haskell2010
 
+flag prover-ple-pos
+     default: False
+
 executable prover-ple-pos
   main-is:            Main.hs
-  if !flag(build-pos)
+  if !flag(prover-ple-pos) && flag(stack)
     buildable:        False
 
   hs-source-dirs:     app
@@ -434,10 +465,15 @@ executable prover-ple-pos
   ghc-options:      -fplugin=LiquidHaskell -fkeep-going -ddump-timings -ddump-to-file -O0
   default-language: Haskell2010
 
+flag benchmark-text
+     default: False
 
 executable benchmark-text
   main-is: Main.hs
   -- XXX(matt.walker): Get this working!
+
+  if !flag(benchmark-text) && flag(stack)
+    buildable: False
   buildable: False
 
   hs-source-dirs: app
@@ -512,9 +548,12 @@ executable benchmark-text
                -fkeep-going
                -fplugin-opt=LiquidHaskell=--no-check-imports
 
+flag errors
+     default: False
+
 executable errors
     main-is:          Main.hs
-    if !flag(build-neg)
+    if !flag(errors) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -637,10 +676,12 @@ executable errors
 
     default-language: Haskell2010
 
+flag parser-pos
+     default: False
 
 executable parser-pos
     main-is:          Main.hs
-    if !flag(build-pos)
+    if !flag(parser-pos) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -668,9 +709,12 @@ executable parser-pos
 
     default-language: Haskell2010
 
+flag names-pos
+     default: False
+
 executable names-pos
     main-is:          Main.hs
-    if !flag(build-pos)
+    if !flag(names-pos) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -716,9 +760,12 @@ executable names-pos
 
     default-language: Haskell2010
 
+flag names-neg
+     default: False
+
 executable names-neg
     main-is:          Main.hs
-    if !flag(build-neg)
+    if !flag(names-neg) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -745,9 +792,12 @@ executable names-neg
 
     default-language: Haskell2010
 
+flag reflect-pos
+     default: False
+
 executable reflect-pos
     main-is:          Main.hs
-    if !flag(build-pos)
+    if !flag(reflect-pos) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -765,9 +815,12 @@ executable reflect-pos
 
     default-language: Haskell2010
 
+flag class-pos
+      default: False
+
 executable class-pos
     main-is:          Main.hs
-    if !flag(build-pos)
+    if !flag(class-pos) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -790,9 +843,12 @@ executable class-pos
 
     default-language: Haskell2010
 
+flag class-neg
+      default: False
+
 executable class-neg
     main-is:          Main.hs
-    if !flag(build-neg)
+    if !flag(class-neg) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -811,9 +867,12 @@ executable class-neg
 
     default-language: Haskell2010
 
+flag reflect-neg
+     default: False
+
 executable reflect-neg
     main-is:          Main.hs
-    if !flag(build-neg)
+    if !flag(reflect-neg) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -831,9 +890,12 @@ executable reflect-neg
 
     default-language: Haskell2010
 
+flag measure-pos
+     default: False
+
 executable measure-pos
     main-is:          Main.hs
-    if !flag(build-pos)
+    if !flag(measure-pos) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -873,9 +935,12 @@ executable measure-pos
 
     default-language: Haskell2010
 
+flag measure-neg
+     default: False
+
 executable measure-neg
     main-is:          Main.hs
-    if !flag(build-neg)
+    if !flag(measure-neg) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -905,9 +970,12 @@ executable measure-neg
 
     default-language: Haskell2010
 
+flag datacon-pos
+     default: False
+
 executable datacon-pos
     main-is:          Main.hs
-    if !flag(build-pos)
+    if !flag(datacon-pos) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -936,9 +1004,12 @@ executable datacon-pos
 
     default-language: Haskell2010
 
+flag datacon-neg
+     default: False
+
 executable datacon-neg
     main-is:          Main.hs
-    if !flag(build-neg)
+    if !flag(datacon-neg) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -962,11 +1033,12 @@ executable datacon-neg
 
     default-language: Haskell2010
 
-
+flag unit-neg
+     default: False
 
 executable unit-neg
     main-is:          Main.hs
-    if !flag(build-neg)
+    if !flag(unit-neg) && flag(stack)
       buildable:      False
 
     hs-source-dirs:   app
@@ -1190,10 +1262,13 @@ executable unit-neg
 
     default-language: Haskell2010
 
+flag unit-pos
+     default: False
+
 executable unit-pos
     main-is:          Main.hs
     -- Modules included in this executable, other than Main.
-    if !flag(build-pos)
+    if !flag(unit-pos) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -1754,9 +1829,12 @@ executable unit-pos
     include-dirs:     ffi-include
     default-language: Haskell2010
 
+flag absref-pos
+     default: False
+
 executable absref-pos
     main-is:          Main.hs
-    if !flag(build-pos)
+    if !flag(absref-pos) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -1784,9 +1862,12 @@ executable absref-pos
 
     default-language: Haskell2010
 
+flag absref-neg
+     default: False
+
 executable absref-neg
     main-is:          Main.hs
-    if !flag(build-neg)
+    if !flag(absref-neg) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -1809,10 +1890,12 @@ executable absref-neg
 
     default-language: Haskell2010
 
+flag basic-neg
+     default: False
 
 executable basic-neg
     main-is:          Main.hs
-    if !flag(build-neg)
+    if !flag(basic-neg) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -1837,9 +1920,12 @@ executable basic-neg
 
     default-language: Haskell2010
 
+flag basic-pos
+     default: False
+
 executable basic-pos
     main-is:          Main.hs
-    if !flag(build-pos)
+    if !flag(basic-pos) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -1872,9 +1958,12 @@ executable basic-pos
 
     default-language: Haskell2010
 
+flag import-cli
+     default: False
+
 executable import-cli
     main-is:          Main.hs
-    if !flag(build-pos)
+    if !flag(import-cli) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -1963,9 +2052,12 @@ executable import-cli
 
     default-language: Haskell2010
 
+flag ple-pos
+     default: False
+
 executable ple-pos
     main-is:          Main.hs
-    if !flag(build-pos)
+    if !flag(ple-pos) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -2030,9 +2122,12 @@ executable ple-pos
 
     default-language: Haskell2010
 
+flag ple-neg
+     default: False
+
 executable ple-neg
     main-is:          Main.hs
-    if !flag(build-neg)
+    if !flag(ple-neg) && flag(stack)
       buildable:      False
 
 
@@ -2065,9 +2160,12 @@ executable ple-neg
 
     default-language: Haskell2010
 
+flag rankN-pos
+     default: False
+
 executable rankN-pos
     main-is:          Main.hs
-    if !flag(build-pos)
+    if !flag(rankN-pos) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -2086,9 +2184,12 @@ executable rankN-pos
 
     default-language: Haskell2010
 
+flag terminate-pos
+     default: False
+
 executable terminate-pos
     main-is:          Main.hs
-    if !flag(build-pos)
+    if !flag(terminate-pos) && flag(stack)
       buildable:      False
 
     other-modules:
@@ -2124,9 +2225,12 @@ executable terminate-pos
 
     default-language: Haskell2010
 
+flag terminate-neg
+     default: False
+
 executable terminate-neg
     main-is:          Main.hs
-    if !flag(build-neg)
+    if !flag(terminate-neg) && flag(stack)
       buildable:      False
 
     other-modules:

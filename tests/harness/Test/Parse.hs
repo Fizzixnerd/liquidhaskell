@@ -48,7 +48,7 @@ skipRestOfLine = P.takeWhileP Nothing (/= '\n') *> void P.eol
 moduleName :: Parser ModuleName
 moduleName = do
   first <- P.upperChar
-  rest <- P.takeWhileP Nothing (/= ' ')
+  rest <- P.takeWhileP Nothing (\x -> x /= ' ' && x /= '\n')
   pure $ first `T.cons` rest
 
 -- | This is the stdout parser for things that look like:
@@ -156,11 +156,11 @@ ghcPanic = do
 compilerMessage :: TestGroupName -> Parser (Either ErrorException CompilerMessage)
 compilerMessage testGroupName = do
   P.option () (void $ P.many $ spuriousWarning <|> spuriousTrace)
-  panic <- P.option Nothing $ Just <$> P.try ghcPanic
+  panic <- P.option Nothing $ Just <$> ghcPanic
   case panic of
     Just p -> pure $ Left $ GhcPanicException testGroupName p
     Nothing -> do
-      cmSpan <- P.try fileSpan
+      cmSpan <- fileSpan
       cmMood <- (MError <$ P.chunk "error") <|> (MWarning <$ P.chunk "warning")
       void $ P.single ':'
       skipRestOfLine
@@ -240,7 +240,7 @@ results TestGroupData {..} =
 errorMap :: TestGroupData -> Parser (Either ErrorException (Map (Maybe ModuleName) [CompilerMessage]))
 errorMap tgd@TestGroupData {..} = do
   P.option () (void $ P.many $ P.chunk "Unknown flag: -B" *> P.eol)
-  messages <- compilerMessage tgdName `P.sepBy` P.eol
+  messages <- compilerMessage tgdName `P.sepEndBy` P.eol
   pure $ do
     msgs <- sequence messages
     let grouped = L.groupBy (\m n -> fsName (cmSpan m) == fsName (cmSpan n)) msgs
@@ -259,8 +259,30 @@ stripStackHeader = T.unlines .
                    fmap (\x -> fromMaybe x $ T.stripPrefix "> " <=< (pure . T.stripStart) <=< T.stripPrefix "tests" $ x) .
                    T.lines
 
-stripBuildingAllMessages :: Text -> Text
-stripBuildingAllMessages = T.unlines . filter (not . ("Building all executables for"  `T.isPrefixOf`)) . T.lines
+stripStackExtraneousMessages :: Text -> Text
+stripStackExtraneousMessages = T.stripStart
+                               . T.unlines
+                               . throwOutFooter
+                               . filter (\x ->
+                                           not $ x == "build (exe)"
+                                           || x == "configure (exe)"
+                                           || x == "copy/register"
+                                           || "Configuring " `T.isPrefixOf` x
+                                           || "Building all executables for" `T.isPrefixOf` x
+                                           || "Preprocessing executable " `T.isPrefixOf` x
+                                           || "Building executable" `T.isPrefixOf` x
+                                           || "Chasing dependencies:" `T.isPrefixOf` x
+                                           || "initializing package database:" `T.isPrefixOf` x
+                                           || "Installing executable " `T.isPrefixOf` x
+                                           || "Linking " `T.isPrefixOf` x
+                                           || "systool:" `T.isPrefixOf` x)
+                               . T.lines
+  where
+    throwOutFooter = go []
+    go acc [] = reverse acc
+    go acc (x:xs)
+      | "--  While building package" `T.isPrefixOf` x = reverse acc
+      | otherwise = go (x : acc) xs
 
 -- | Use this function to parse stdout.
 parseResults :: TestGroupData -> Text -> Either (ParseErrorBundle Text Void) (Either ResultsException [ModuleInfo])
@@ -268,4 +290,4 @@ parseResults tgd = P.parse (results tgd <* P.space <* P.eof) "<cabal-install std
 
 -- | Use this function to parse stderr.
 parseErrors :: TestGroupData -> Text -> Either (ParseErrorBundle Text Void) (Either ErrorException (Map (Maybe ModuleName) [CompilerMessage]))
-parseErrors tgd = P.parse (errorMap tgd <* P.space <* P.eof) "<cabal-install stderr>"
+parseErrors tgd = P.parse (P.space *> errorMap tgd <* P.space <* P.eof) "<cabal-install stderr>"

@@ -16,13 +16,14 @@ import Test.Groups
 import Test.Summary
 import Data.Traversable (for)
 import System.Exit (exitSuccess, exitFailure)
-import Data.Text (Text)
 import qualified Data.ByteString.Lazy as BS
+import Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import qualified Data.Text.Encoding as TE
 import qualified Text.Megaparsec as P
 import Data.Map (Map)
+import Data.List (partition, intersperse)
 import Test.Types
 import Test.Parse hiding (results)
 import System.Process.Typed
@@ -57,16 +58,18 @@ cabalBuild onlyDeps name = do
 
 -- | Build using stack.  XXX Currently doesn't work
 stackBuild :: OnlyDeps -> TestGroupName -> IO (ExitCode, Text, Text)
-stackBuild onlyDeps name =
-  command "stack"
+stackBuild onlyDeps name = do
+  (ec, _out, err) <- command "stack" $
      [ "build"
      , "--flag", "tests:stack"
-     , "--flag", "tests:build-neg"
-     , "--flag", "tests:build-pos"
-     , "--no-interleaved-output"
-     , (if onlyDeps then "--only-dependencies" else "--")
-     , ("tests:" <> name)
-     ]
+     , "--flag", ("tests:" <> name)
+     , "--no-interleaved-output" ]
+     <> (if onlyDeps then [ "--only-dependencies" ] else [])
+     <> [ "--" ]
+     <> [ "tests:" <> name ]
+  let (buildMsgs, errMsgs) = partition ("[" `T.isPrefixOf`) (T.lines err)
+  T.putStrLn _out
+  pure (ec, T.unlines $ intersperse "" buildMsgs, T.unlines errMsgs)
 
 -- | Given a "builder" command and some `TestGroupData`, create an IO action
 -- that parses the results of running the build command. Outputs can be fed into
@@ -120,12 +123,13 @@ stackOutputStripper :: Text -> Text
 stackOutputStripper = cabalOutputStripper . stripStackHeader
 
 stackErrorStripper :: Text -> Text
-stackErrorStripper = cabalErrorStripper . stripStackHeader . stripBuildingAllMessages
+stackErrorStripper = cabalErrorStripper . stripStackExtraneousMessages . stripStackHeader
 
 program :: Sh () -> (Text -> Text) -> (Text -> Text) -> (OnlyDeps -> TestGroupName -> IO (ExitCode, Text, Text)) -> IO ()
 program testEnv outputStripper errorStripper builder = do
   Sh.shelly testEnv
-  flagsAndActions <- for (M.toList allTestGroups) $ \(_name, tgd) -> do
+  allTestGroups' <- M.toList <$> allTestGroups
+  flagsAndActions <- for allTestGroups' $ \(_name, tgd) -> do
     (err, res) <- buildAndParseResults outputStripper errorStripper builder tgd
     let (flag, action) =
           case (err, res) of

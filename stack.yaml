@@ -5,6 +5,8 @@ flags:
     devel: true
   tests:
     stack: true
+    build-pos: false
+    build-neg: false
 extra-package-dbs: []
 ghc-options:
   hscolour: -w

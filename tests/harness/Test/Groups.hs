@@ -6,58 +6,64 @@ import Data.Map (Map)
 import qualified Data.Map as M
 import qualified Data.Text as T
 import qualified System.FilePath as FP
+import System.Environment (lookupEnv)
 import Test.Types
 
 -- | When you want to add a new test group, create a cabal executable for it in
 -- tests.cabal and add it here. See `TestFlavor` for information on the
 -- different flavors of test groups.
-allTestGroups :: Map TestGroupName TestGroupData
-allTestGroups = M.fromList $ fmap (\tgd -> (tgdName tgd, tgd)) $
-  [ -- micros
-    TestGroupData "unit-pos" ["pos"] TFSafe
-  , TestGroupData "unit-neg" ["neg"] TFUnsafe
-  , TestGroupData "basic-pos" ["basic/pos"] TFSafe
-  , TestGroupData "basic-neg" ["basic/neg"] TFUnsafe
-  , TestGroupData "class-pos" ["classes/pos"] TFSafe
-  , TestGroupData "class-neg" ["classes/neg"] TFUnsafe
-  , TestGroupData "parser-pos" ["parser/pos"] TFSafe
-  , TestGroupData "measure-pos" ["measure/pos"] TFSafe
-  , TestGroupData "measure-neg" ["measure/neg"] TFUnsafe
-  , TestGroupData "datacon-pos" ["datacon/pos"] TFSafe
-  , TestGroupData "datacon-neg" ["datacon/neg"] TFUnsafe
-  , TestGroupData "names-pos" ["names/pos"] TFSafe
-  , TestGroupData "names-neg" ["names/neg"] TFUnsafe
-  , TestGroupData "reflect-pos" ["reflect/pos"] TFSafe
-  , TestGroupData "reflect-neg" ["reflect/neg"] TFUnsafe
-  , TestGroupData "absref-pos" ["absref/pos"] TFSafe
-  , TestGroupData "absref-neg" ["absref/neg"] TFUnsafe
-  , TestGroupData "import-cli" ["import/client", "import/lib"] TFSafe
-  , TestGroupData "ple-pos" ["ple/pos"] TFSafe
-  , TestGroupData "ple-neg" ["ple/neg"] TFUnsafe
-  , TestGroupData "rankN-pos" ["RankNTypes/pos"] TFSafe
-  , TestGroupData "terminate-pos" ["terminate/pos"] TFSafe
-  , TestGroupData "terminate-neg" ["terminate/neg"] TFUnsafe
-  -- benchmarks
-  , TestGroupData "benchmark-stitch-lh" ["benchmarks/stitch-lh"] TFBench
-  -- XXX(matt.walker): I can't get this to work yet, but it mysteriously
-  --                   works in the old test framework...
-  -- , TestGroupData "benchmark-text" "benchmarks/text-0.11.2.3" TFBench
-  , TestGroupData "benchmark-bytestring" ["benchmarks/bytestring-0.9.2.1"] TFBench
-  , TestGroupData "benchmark-vector-algorithms" ["benchmarks/vector-algorithms-0.5.4.2"] TFBench
-  , TestGroupData "benchmark-cse230" ["benchmarks/cse230/src/Week10"] TFBench
-  , TestGroupData "benchmark-esop2013" ["benchmarks/esop2013-submission"] TFBench
-  , TestGroupData "benchmark-icfp15-pos" ["benchmarks/icfp15/pos"] TFBench
-  , TestGroupData "benchmark-icfp15-neg" ["benchmarks/icfp15/neg"] TFUnsafe
-  -- prover
-  , TestGroupData "prover-foundations" ["benchmarks/sf"] TFBench
-  -- NOTE: This is compiled automatically as a dependency
-  --, TestGroupData "prover-ple-lib" "benchmarks/popl18/lib" TFBench
-  , TestGroupData "prover-ple-pos" ["benchmarks/popl18/ple/pos"] TFBench
-  , TestGroupData "prover-nople-pos" ["benchmarks/popl18/nople/pos"] TFBench
-  , TestGroupData "prover-nople-neg" ["benchmarks/popl18/nople/neg"] TFUnsafe
-  -- error messages
-  , TestGroupData "errors" ["errors"] (TFError errorMsgs)
-  ]
+allTestGroups :: IO (Map TestGroupName TestGroupData)
+allTestGroups = do
+  Just pwd <- lookupEnv "PWD"
+  pure
+    $ M.fromList
+    $ fmap (\tgd -> ( tgdName tgd
+                    , tgd { tgdDirectories = concatMap (\d -> [T.pack $ pwd FP.</> "tests" FP.</> T.unpack d, d]) $ tgdDirectories tgd }))
+    [ -- micros
+      TestGroupData "unit-pos" ["pos"] TFSafe
+    , TestGroupData "unit-neg" ["neg"] TFUnsafe
+    , TestGroupData "basic-pos" ["basic/pos"] TFSafe
+    , TestGroupData "basic-neg" ["basic/neg"] TFUnsafe
+    , TestGroupData "class-pos" ["classes/pos"] TFSafe
+    , TestGroupData "class-neg" ["classes/neg"] TFUnsafe
+    , TestGroupData "parser-pos" ["parser/pos"] TFSafe
+    , TestGroupData "measure-pos" ["measure/pos"] TFSafe
+    , TestGroupData "measure-neg" ["measure/neg"] TFUnsafe
+    , TestGroupData "datacon-pos" ["datacon/pos"] TFSafe
+    , TestGroupData "datacon-neg" ["datacon/neg"] TFUnsafe
+    , TestGroupData "names-pos" ["names/pos"] TFSafe
+    , TestGroupData "names-neg" ["names/neg"] TFUnsafe
+    , TestGroupData "reflect-pos" ["reflect/pos"] TFSafe
+    , TestGroupData "reflect-neg" ["reflect/neg"] TFUnsafe
+    , TestGroupData "absref-pos" ["absref/pos"] TFSafe
+    , TestGroupData "absref-neg" ["absref/neg"] TFUnsafe
+    , TestGroupData "import-cli" ["import/client", "import/lib"] TFSafe
+    , TestGroupData "ple-pos" ["ple/pos"] TFSafe
+    , TestGroupData "ple-neg" ["ple/neg"] TFUnsafe
+    , TestGroupData "rankN-pos" ["RankNTypes/pos"] TFSafe
+    , TestGroupData "terminate-pos" ["terminate/pos"] TFSafe
+    , TestGroupData "terminate-neg" ["terminate/neg"] TFUnsafe
+    -- benchmarks
+    , TestGroupData "benchmark-stitch-lh" ["benchmarks/stitch-lh"] TFBench
+    -- XXX(matt.walker): I can't get this to work yet, but it mysteriously
+    --                   works in the old test framework...
+    -- , TestGroupData "benchmark-text" "benchmarks/text-0.11.2.3" TFBench
+    , TestGroupData "benchmark-bytestring" ["benchmarks/bytestring-0.9.2.1"] TFBench
+    , TestGroupData "benchmark-vector-algorithms" ["benchmarks/vector-algorithms-0.5.4.2"] TFBench
+    , TestGroupData "benchmark-cse230" ["benchmarks/cse230/src/Week10"] TFBench
+    , TestGroupData "benchmark-esop2013" ["benchmarks/esop2013-submission"] TFBench
+    , TestGroupData "benchmark-icfp15-pos" ["benchmarks/icfp15/pos"] TFBench
+    , TestGroupData "benchmark-icfp15-neg" ["benchmarks/icfp15/neg"] TFUnsafe
+    -- prover
+    , TestGroupData "prover-foundations" ["benchmarks/sf"] TFBench
+    -- NOTE: This is compiled automatically as a dependency
+    --, TestGroupData "prover-ple-lib" "benchmarks/popl18/lib" TFBench
+    , TestGroupData "prover-ple-pos" ["benchmarks/popl18/ple/pos"] TFBench
+    , TestGroupData "prover-nople-pos" ["benchmarks/popl18/nople/pos"] TFBench
+    , TestGroupData "prover-nople-neg" ["benchmarks/popl18/nople/neg"] TFUnsafe
+    -- error messages
+    , TestGroupData "errors" ["errors"] (TFError errorMsgs)
+    ]
 
 -- * `TFError`-flavored tests are tests which we check the error message to make
 --   sure it matches what we expect (using `T.isInfixOf`). Below are some
