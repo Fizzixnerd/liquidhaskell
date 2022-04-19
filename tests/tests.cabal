@@ -688,7 +688,8 @@ executable parser-pos
                     , TokensAsPrefixes
                     , Tuples
 
-    ghc-options:      -fplugin=LiquidHaskell -ddump-timings -ddump-to-file -fkeep-going -O0 -j
+                    -- XXX(matt.walker): Double frees with -j
+    ghc-options:      -fplugin=LiquidHaskell -ddump-timings -ddump-to-file -fkeep-going -O0
     build-depends:    liquid-base
                     , liquid-prelude
                     , liquidhaskell
@@ -1238,7 +1239,8 @@ executable unit-neg
                     -- , QQTySyn2
                     -- , Variance1
 
-    ghc-options:      -fplugin=LiquidHaskell -ddump-to-file -fkeep-going -O0 -j
+                    -- XXX(matt.walker): double frees on -j
+    ghc-options:      -fplugin=LiquidHaskell -ddump-to-file -fkeep-going -O0
     build-depends:    liquid-base
                     , liquid-prelude
                     , liquid-containers
@@ -1798,7 +1800,8 @@ executable unit-pos
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
-    ghc-options:      -fplugin=LiquidHaskell -ddump-timings -ddump-to-file -fkeep-going -O0 -j
+    -- XXX(matt.walker): Double frees on -j
+    ghc-options:      -fplugin=LiquidHaskell -ddump-timings -ddump-to-file -fkeep-going -O0
     build-depends:    liquid-base
                     , liquid-prelude
                     , liquid-containers
