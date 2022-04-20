@@ -218,10 +218,10 @@ commands:
       - run:
           name: Test
           command: |
-            stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> run << parameters.extra_build_flags >> --silent test-driver -- --show-all | circleci tests split > tests.txt
+            stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> run --silent test-driver -- --show-all | circleci tests split > tests.txt
             echo "running tests:"
             cat tests.txt
-            stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> run << parameters.extra_build_flags >> test-driver -- $(cat tests.txt)
+            stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> run test-driver -- $(cat tests.txt)
           no_output_timeout: 30m
       - run:
           name: Parser Test
