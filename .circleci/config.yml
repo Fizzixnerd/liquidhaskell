@@ -162,11 +162,11 @@ commands:
           name: Dependencies
           command: |
             wget -qO- https://get.haskellstack.org/ | sudo sh
-            echo test0
             stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> setup
-            echo test1
             stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> clean
+            echo test2
             stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> build -j4 --only-dependencies --test --no-run-tests << parameters.extra_build_flags >> 
+            echo test3
       - save_cache:
           key: stack-cache-v1-{{ checksum "<< parameters.stack_yaml_file >>" }}-{{ checksum "liquidhaskell.cabal" }}-{{ checksum "liquid-fixpoint-commit" }}
           paths:
