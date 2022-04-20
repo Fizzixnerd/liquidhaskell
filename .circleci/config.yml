@@ -162,7 +162,9 @@ commands:
           name: Dependencies
           command: |
             wget -qO- https://get.haskellstack.org/ | sudo sh
+            echo test0
             stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> setup
+            echo test1
             stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> clean
             stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> build -j4 --only-dependencies --test --no-run-tests << parameters.extra_build_flags >> 
       - save_cache:
