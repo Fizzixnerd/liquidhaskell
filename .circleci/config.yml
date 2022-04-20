@@ -112,6 +112,18 @@ commands:
             - cabal-cache-v3-{{ checksum "liquidhaskell.cabal" }}-{{ checksum "<< parameters.project_file >>" }}-{{ checksum "liquid-fixpoint-commit" }}
             - cabal-cache-v3-{{ checksum "liquidhaskell.cabal" }}-{{ checksum "<< parameters.project_file >>" }}
       - run:
+          name: Install Haskell
+          command: |
+            wget https://downloads.haskell.org/~ghcup/x86_64-linux-ghcup
+            chmod +x ./x86_64-linux-ghcup
+            ./x86_64-linux-ghcup install ghc << parameters.ghc_version >>
+            ./x86_64-linux-ghcup set ghc << parameters.ghc_version >>
+            ./x86_64-linux-ghcup install cabal 3.6.2.0
+            export PATH=~/.ghcup/bin:$PATH
+            echo 'export PATH=~/.ghcup/bin:$PATH' >> $BASH_ENV
+            << parameters.cabal_update_command >>
+            cabal v2-clean
+      - run:
           name: Setup Test
           command: |
             << parameters.setup_test_extra_steps >>
@@ -120,7 +132,7 @@ commands:
           command: |
             LIQUID_CABAL_PROJECT_FILE=<<parameters.project_file>> cabal v2-run --project-file << parameters.project_file >> test-driver -- --list-all | circleci tests split > test.txt
             LIQUID_CABAL_PROJECT_FILE=<<parameters.project_file>> cabal v2-run --project-file << parameters.project_file >> test-driver -- $(tests.txt) || (<<parameters.allow_test_failures>>)
-            (liquidhaskell_datadir=$PWD cabal v2-test -j1 --project-file << parameters.project_file >> liquidhaskell:liquidhaskell-parser --flag include --flag devel --test-show-details=streaming --test-options="--xml=/tmp/junit/cabal/parser-test-results.xml") || (<<parameters.allow_test_failures>>)
+            (liquidhaskell_datadir=$PWD cabal v2-test -j1 --project-file << parameters.project_file >> liquidhaskell:liquidhaskell-parser --flag include --flag devel --test-show-details=streaming || (<<parameters.allow_test_failures>>)
           no_output_timeout: 30m
 
   stack_build:
@@ -194,6 +206,11 @@ commands:
             - stack-cache-v1-{{ checksum "<< parameters.stack_yaml_file >>" }}-{{ checksum "liquidhaskell.cabal" }}-{{ checksum "liquid-fixpoint-commit" }}
             - stack-cache-v1-{{ checksum "<< parameters.stack_yaml_file >>" }}-{{ checksum "liquidhaskell.cabal" }}
             - stack-cache-v1-{{ checksum "<< parameters.stack_yaml_file >>" }}
+      - run:
+          name: Install Stack
+          command: |
+            wget -qO- https://get.haskellstack.org/ | sudo sh
+            stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> setup
       - run:
           name: Test
           command: |
