@@ -122,7 +122,6 @@ commands:
             export PATH=~/.ghcup/bin:$PATH
             echo 'export PATH=~/.ghcup/bin:$PATH' >> $BASH_ENV
             << parameters.cabal_update_command >>
-            cabal v2-clean
       - run:
           name: Setup Test
           command: |
@@ -164,6 +163,7 @@ commands:
           command: |
             wget -qO- https://get.haskellstack.org/ | sudo sh
             stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> setup
+            stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> clean
             stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> build -j4 --only-dependencies --test --no-run-tests << parameters.extra_build_flags >> 
       - save_cache:
           key: stack-cache-v1-{{ checksum "<< parameters.stack_yaml_file >>" }}-{{ checksum "liquidhaskell.cabal" }}-{{ checksum "liquid-fixpoint-commit" }}
@@ -214,7 +214,6 @@ commands:
       - run:
           name: Test
           command: |
-            stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> clean
             stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> run test-driver -- --list-all | circleci tests split > tests.txt
             stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> run test-driver -- $(cat tests.txt)
           no_output_timeout: 30m
