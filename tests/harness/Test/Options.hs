@@ -11,8 +11,10 @@ options = Options <$>
   (many (argument
          (T.pack <$> str)
           (metavar "TESTGROUPNAMES..."
-           <> showDefault
            <> help ("Zero or more of: " <> mconcat (intersperse ", " (T.unpack <$> allTestGroupNames))))))
+  <*> (switch 
+        (long "show-all"
+         <> help "List all the test types in a manner useful for splitting in Circle CI."))
 
 opts :: ParserInfo Options
 opts = info (options <**> helper)

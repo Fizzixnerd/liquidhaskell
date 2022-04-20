@@ -127,12 +127,12 @@ cabalErrorStripper = stripDDumpTimingsOutput . stripAnsiEscapeCodes
 stackTestEnv :: Sh ()
 stackTestEnv = ensurePathContains "stack"
 
--- | Strip colors and the stack header from "stdout" (see buildStack; not
+-- | Strip colors and the stack header from "stdout" (see stackBuild; not
 -- actually stdout)
 stackOutputStripper :: Text -> Text
 stackOutputStripper = cabalOutputStripper . stripStackHeader
 
--- | Strip colors and extra messages from "stderr" (see buildStack; not actually
+-- | Strip colors and extra messages from "stderr" (see stackBuild; not actually
 -- stderr)
 stackErrorStripper :: Text -> Text
 stackErrorStripper = cabalErrorStripper . stripStackExtraneousMessages . stripStackHeader
@@ -140,7 +140,10 @@ stackErrorStripper = cabalErrorStripper . stripStackExtraneousMessages . stripSt
 -- | For building `main`; provided so that we don't repeat outselves in
 -- "Driver_cabal.hs" and "Driver_stack.hs"
 program :: Sh () -> (Text -> Text) -> (Text -> Text) -> (OnlyDeps -> TestGroupName -> IO (ExitCode, Text, Text)) -> Options -> IO ()
-program testEnv outputStripper errorStripper builder os = do
+program _ _ _ _ (Options _ True) = do
+  void $ for allTestGroupNames T.putStrLn
+  exitSuccess
+program testEnv outputStripper errorStripper builder os@(Options _ False) = do
   Sh.shelly testEnv
   allTestGroupsMap <- allTestGroups
   let selectedGroups = for (testGroups os) $ \name -> M.lookup name allTestGroupsMap

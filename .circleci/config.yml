@@ -23,8 +23,8 @@ commands:
       - run: git submodule sync
       - run: git submodule update --init
 
-  cabal_build_and_test:
-    description: "Build the project and run the tests"
+  cabal_build:
+    description: "Build the project"
     parameters:
       allow_test_failures:
         type: boolean
@@ -76,20 +76,55 @@ commands:
             - ~/.cabal/store
             - ~/.ghcup
             - ./dist-newstyle
+
+  cabal_test:
+    description: "Test the project"
+    parameters:
+      allow_test_failures:
+        type: boolean
+        default: false
+      cabal_update_command:
+        type: string
+        default: "cabal v2-update"
+      ghc_version:
+        type: string
+        default: "8.10.7"
+      project_file:
+        type: string
+        default: "cabal.project"
+      extra_test_flags:
+        type: string
+        default: ""
+      liquid_runner:
+        type: string
+        default: "--liquid-runner=cabal v2-run liquidhaskell -- "
+      ghc_options:
+        type: string
+        default: "--ghc-options=\"+RTS -M2G -RTS\""
+      setup_test_extra_steps:
+        type: string
+        default: ""
+    steps:
+      - setup_project
+      - run: git ls-tree HEAD liquid-fixpoint > liquid-fixpoint-commit
+      - restore_cache:
+          keys:
+            - cabal-cache-v3-{{ checksum "liquidhaskell.cabal" }}-{{ checksum "<< parameters.project_file >>" }}-{{ checksum "liquid-fixpoint-commit" }}
+            - cabal-cache-v3-{{ checksum "liquidhaskell.cabal" }}-{{ checksum "<< parameters.project_file >>" }}
       - run:
           name: Setup Test
           command: |
-            mkdir -p /tmp/junit/cabal
             << parameters.setup_test_extra_steps >>
       - run:
           name: Test
           command: |
-            LIQUID_CABAL_PROJECT_FILE=<<parameters.project_file>> cabal v2-run --project-file << parameters.project_file >> test-driver || (<<parameters.allow_test_failures>>)
+            LIQUID_CABAL_PROJECT_FILE=<<parameters.project_file>> cabal v2-run --project-file << parameters.project_file >> test-driver -- --list-all | circleci tests split > test.txt
+            LIQUID_CABAL_PROJECT_FILE=<<parameters.project_file>> cabal v2-run --project-file << parameters.project_file >> test-driver -- $(tests.txt) || (<<parameters.allow_test_failures>>)
             (liquidhaskell_datadir=$PWD cabal v2-test -j1 --project-file << parameters.project_file >> liquidhaskell:liquidhaskell-parser --flag include --flag devel --test-show-details=streaming --test-options="--xml=/tmp/junit/cabal/parser-test-results.xml") || (<<parameters.allow_test_failures>>)
           no_output_timeout: 30m
 
-  stack_build_and_test:
-    description: "Build and test the project using Stack"
+  stack_build:
+    description: "Build the project using Stack"
     parameters:
       stack_yaml_file:
         type: string
@@ -124,14 +159,6 @@ commands:
             - ~/.stack
             - ./.stack-work
       - run:
-          name: Test
-          command: |
-            stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> clean
-            mkdir -p /tmp/junit/stack
-            stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> run test-driver
-            stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> test -j1 liquidhaskell:liquidhaskell-parser << parameters.extra_build_flags >>
-          no_output_timeout: 30m
-      - run:
           name: Generate haddock
           command: |
             # stack haddock liquidhaskell --flag liquidhaskell:-devel --no-haddock-deps --haddock-arguments="--no-print-missing-docs --odir=$CIRCLE_ARTIFACTS"
@@ -143,31 +170,100 @@ commands:
             # skip if extra_build_flags are set
             [ ! -z "<< parameters.extra_build_flags >>" ] || stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> sdist
 
+  stack_test:
+    description: "Test the project using Stack"
+    parameters:
+      stack_yaml_file:
+        type: string
+        default: "stack.yaml"
+      liquid_runner:
+        type: string
+        default: "stack --silent exec -- liquidhaskell -v0"
+      extra_test_flags:
+        type: string
+        default: ""
+      extra_build_flags:
+        type: string
+        default: ""
+    steps:
+      - run: sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 8B1DA6120C2BF624
+      - setup_project
+      - run: git ls-tree HEAD liquid-fixpoint > liquid-fixpoint-commit
+      - restore_cache:
+          keys:
+            - stack-cache-v1-{{ checksum "<< parameters.stack_yaml_file >>" }}-{{ checksum "liquidhaskell.cabal" }}-{{ checksum "liquid-fixpoint-commit" }}
+            - stack-cache-v1-{{ checksum "<< parameters.stack_yaml_file >>" }}-{{ checksum "liquidhaskell.cabal" }}
+            - stack-cache-v1-{{ checksum "<< parameters.stack_yaml_file >>" }}
+      - run:
+          name: Test
+          command: |
+            stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> clean
+            stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> run test-driver -- --list-all | circleci tests split > tests.txt
+            stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> run test-driver -- $(cat tests.txt)
+          no_output_timeout: 30m
+      - run:
+          name: Parser Test
+          command: |
+            stack --no-terminal --stack-yaml << parameters.stack_yaml_file >> test -j1 liquidhaskell:liquidhaskell-parser << parameters.extra_build_flags >>
+
+
 jobs:
 
-  stack_810:
+  stack_810_build:
     machine:
       image: ubuntu-2004:202107-02
     steps:
-        - stack_build_and_test:
-            stack_yaml_file: "stack.yaml"
-            extra_build_flags: "--flag liquidhaskell:devel"
-            extra_test_flags: " liquid-platform:liquidhaskell "
+      - stack_build:
+          stack_yaml_file: "stack.yaml"
+          extra_build_flags: "--flag liquidhaskell:devel"
+          extra_test_flags: " liquid-platform:liquidhaskell "
 
-  cabal_810:
+  stack_810_test:
+    machine:
+      image: ubuntu-2004:202107-02
+    parallelism: 4
+    steps:
+      - stack_test:
+          stack_yaml_file: "stack.yaml"
+          extra_build_flags: "--flag liquidhaskell:devel"
+          extra_test_flags: " liquid-platform:liquidhaskell "
+
+  cabal_810_build:
     machine:
       image: ubuntu-2004:202107-02
     steps:
-      - cabal_build_and_test:
+      - cabal_build:
           liquid_runner: "--liquid-runner=cabal -v0 v2-exec liquidhaskell -- -v0 \
                           -package-env=$(./scripts/generate_testing_ghc_env) \
                           -package=liquidhaskell -package=Cabal "
 
-  cabal_900:
+  cabal_810_test:
+    machine:
+      image: ubuntu-2004:202107-02
+    parallelism: 4
+    steps:
+      - cabal_test:
+          liquid_runner: "--liquid-runner=cabal -v0 v2-exec liquidhaskell -- -v0 \
+                          -package-env=$(./scripts/generate_testing_ghc_env) \
+                          -package=liquidhaskell -package=Cabal "
+
+  cabal_900_build:
     machine:
       image: ubuntu-2004:202107-02
     steps:
-      - cabal_build_and_test:
+      - cabal_build:
+          ghc_version: "9.0.1"
+          project_file: "cabal.ghc9.project"
+          liquid_runner: "--liquid-runner=cabal -v0 v2-exec --project-file cabal.ghc9.project liquidhaskell -- -v0 \
+                          -package-env=$(./scripts/generate_testing_ghc_env cabal.ghc9.project) \
+                          -package=liquidhaskell -package=Cabal "
+
+  cabal_900_test:
+    machine:
+      image: ubuntu-2004:202107-02
+    parallelism: 4
+    steps:
+      - cabal_test:
           ghc_version: "9.0.1"
           project_file: "cabal.ghc9.project"
           liquid_runner: "--liquid-runner=cabal -v0 v2-exec --project-file cabal.ghc9.project liquidhaskell -- -v0 \
@@ -178,6 +274,15 @@ workflows:
   version: 2
   build_stack_and_cabal:
     jobs:
-      - stack_810
-      - cabal_810
-      - cabal_900
+      - stack_810_build
+      - stack_810_test:
+          requires:
+            - stack_810_build
+      - cabal_810_build
+      - cabal_810_test:
+          requires:
+            - cabal_810_build
+      - cabal_900_build
+      - cabal_900_test:
+          requires:
+            - cabal_900_build

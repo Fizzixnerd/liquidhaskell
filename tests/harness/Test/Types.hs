@@ -32,6 +32,7 @@ type Parser = Parsec Void Text
 
 data Options = Options
   { testGroups :: [TestGroupName]
+  , showAll :: Bool
   }
   deriving stock (Eq, Ord, Show)
 
